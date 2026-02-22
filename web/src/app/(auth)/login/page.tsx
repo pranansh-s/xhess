@@ -8,6 +8,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 import { UserLoginSchema } from '@xhess/shared/schemas';
 
 import { handleErrors } from '@/lib/utils/error';
+import { setAccessToken } from '@/lib/utils/auth';
 
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
@@ -35,7 +36,9 @@ export default function LoginPage() {
         password: formState.password?.value,
       });
 
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken();
+      await setAccessToken(token);
 
       router.push('/');
     } catch (err) {

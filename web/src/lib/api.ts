@@ -5,8 +5,9 @@ import { Profile } from '@xhess/shared/schemas';
 
 import { axiosConfig } from '@/constants/config';
 
-import { getAccessToken } from './utils/auth';
 import { handleAPIErrors } from './utils/error';
+import { getAccessToken } from './utils/auth';
+import { auth } from './firebase';
 
 const client = axios.create(axiosConfig);
 
@@ -20,7 +21,19 @@ client.interceptors.response.use(
 
 client.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const token = await getAccessToken();
+    let token: string | null = null;
+
+    if (typeof window === 'undefined') {
+      token = await getAccessToken();
+    } else {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        token = await currentUser.getIdToken();
+      } else {
+        token = await getAccessToken();
+      }
+    }
+
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }

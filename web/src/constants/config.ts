@@ -3,6 +3,14 @@ import { ToastOptions } from 'react-toastify';
 
 import { Duration } from '.';
 
+const getBaseUrl = () => {
+  if(typeof window === 'undefined') {
+    return process.env.BACKEND_URL;
+  }
+
+  return process.env.NEXT_PUBLIC_BACKEND_URL;
+}
+
 export const toastConfig: ToastOptions = {
   type: 'error',
   position: 'top-right',
@@ -12,7 +20,7 @@ export const toastConfig: ToastOptions = {
 };
 
 export const axiosConfig: AxiosRequestConfig = {
-  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL ?? 'http://localhost:8000',
+  baseURL: getBaseUrl(),
   responseType: 'json',
   headers: {
     'Content-Type': 'application/json',

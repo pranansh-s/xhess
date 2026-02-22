@@ -3,6 +3,7 @@ import { signOut } from 'firebase/auth';
 import { Profile } from '@xhess/shared/schemas';
 
 import { handleErrors } from '@/lib/utils/error';
+import { setAccessToken } from '@/lib/utils/auth';
 
 import { get_profile, post_create_profile } from '@/lib/api';
 import { auth } from '@/lib/firebase';
@@ -63,6 +64,7 @@ const UserService = {
       }
 
       await signOut(auth);
+      await setAccessToken(null);
       sessionStorage.removeItem('profile');
       store.dispatch(onLogout());
 

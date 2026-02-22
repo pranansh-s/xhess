@@ -9,6 +9,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { UserRegisterSchema } from '@xhess/shared/schemas';
 
 import { handleErrors } from '@/lib/utils/error';
+import { setAccessToken } from '@/lib/utils/auth';
 
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
@@ -39,7 +40,10 @@ export default function RegisterPage() {
         confirmPassword: formState.confirmPassword?.value ?? '',
       });
 
-      await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const token = await userCredential.user.getIdToken();
+      await setAccessToken(token);
+
       await UserService.createProfile(displayName, email);
 
       router.push('/');
