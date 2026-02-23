@@ -4,12 +4,12 @@ import { ToastOptions } from 'react-toastify';
 import { Duration } from '.';
 
 const getBaseUrl = () => {
-  if(typeof window === 'undefined') {
+  if (typeof window === 'undefined') {
     return process.env.BACKEND_URL;
   }
 
   return process.env.NEXT_PUBLIC_BACKEND_URL;
-}
+};
 
 export const toastConfig: ToastOptions = {
   type: 'error',

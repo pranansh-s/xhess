@@ -40,7 +40,7 @@ const Options = () => {
 
   const handleRoomJoinModal = () => {
     dispatch(openModal('joinRoom'));
-  }
+  };
 
   return (
     <OptionsContainer>

@@ -39,7 +39,7 @@ class ChessService {
         game.state = 'draw';
       }
     }
-  }
+  };
 
   private isStalemate = (color: Color): boolean => {
     const pieces = this.board.flat().filter(p => p && p.color == color) as Piece[];

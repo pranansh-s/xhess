@@ -9,9 +9,9 @@ import { useAppSelector } from '@/redux/hooks';
 
 import GameBar from '../game-bar';
 import GameSettings from '../modals/GameSettings';
+import Surrender from '../modals/Surrender';
 import Waiting from '../modals/Waiting';
 import GameUI from './GameUI';
-import Surrender from '../modals/Surrender';
 
 interface IRoomProps {
   roomId: string;
@@ -26,7 +26,7 @@ const RoomClient: React.FC<IRoomProps> = ({ roomId, room }) => {
     <RoomContainer>
       {activeModal === 'gameSettings' && <GameSettings />}
       {activeModal === 'waiting' && <Waiting />}
-      {activeModal === 'surrender' && <Surrender/>}
+      {activeModal === 'surrender' && <Surrender />}
       <GameUI />
       <GameBar />
     </RoomContainer>
@@ -37,7 +37,7 @@ export default RoomClient;
 
 const RoomContainer = tw.div`
   flex
-  h-screen
+  h-full
   items-center
   justify-center
   gap-10

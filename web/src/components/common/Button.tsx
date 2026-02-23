@@ -75,13 +75,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       return iconNode && <Image width={iconSize ?? 24} height={iconSize ?? 24} src={iconNode} alt="" />;
     };
 
-    const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
-      if (link) {
-        router.push(link);
-      } else if (onClick) {
-        onClick(e);
-      }
-    }, [link, onClick, router]);
+    const handleClick = useCallback(
+      (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (link) {
+          router.push(link);
+        } else if (onClick) {
+          onClick(e);
+        }
+      },
+      [link, onClick, router]
+    );
 
     return (
       <button

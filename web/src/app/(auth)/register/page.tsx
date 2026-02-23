@@ -8,8 +8,8 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 import { UserRegisterSchema } from '@xhess/shared/schemas';
 
-import { handleErrors } from '@/lib/utils/error';
 import { setAccessToken } from '@/lib/utils/auth';
+import { handleErrors } from '@/lib/utils/error';
 
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';

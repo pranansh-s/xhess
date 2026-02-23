@@ -24,9 +24,9 @@ const StyledModalContainer = tw(ModalContainer)`
   flex-row
   items-center
   gap-4
+  border-none
   bg-zinc-900
   py-12
-  border-none
 `;
 
 const WaitingText = tw.span`

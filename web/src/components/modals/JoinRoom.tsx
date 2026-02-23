@@ -60,5 +60,5 @@ const JoinRoom = memo(() => {
   );
 });
 
-JoinRoom.displayName = "JoinRoom";
+JoinRoom.displayName = 'JoinRoom';
 export default JoinRoom;

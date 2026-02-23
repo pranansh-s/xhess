@@ -33,7 +33,7 @@ const MessageItem = memo(({ message, isUserSent }: IMessageItemProps) => {
   );
 });
 
-MessageItem.displayName = "MessageItem";
+MessageItem.displayName = 'MessageItem';
 export default MessageItem;
 
 const MessageContent = tw.span<{ $isUserSent: boolean }>`

@@ -150,7 +150,7 @@ const GameSettings = memo(() => {
   );
 });
 
-GameSettings.displayName = "GameSettings";
+GameSettings.displayName = 'GameSettings';
 export default GameSettings;
 
 const ChooseSideContainer = tw.div`

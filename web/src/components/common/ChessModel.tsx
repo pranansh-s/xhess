@@ -38,5 +38,5 @@ const ChessModel = forwardRef<Group, IChessModelProps>(
   }
 );
 
-ChessModel.displayName = "ChessModel";
+ChessModel.displayName = 'ChessModel';
 export default ChessModel;

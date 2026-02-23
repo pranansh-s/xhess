@@ -18,7 +18,7 @@ const usePreloadedModels = () => {
   const knight = useFBX(modelPaths[1]);
   const bishop = useFBX(modelPaths[2]);
   const pawn = useFBX(modelPaths[3]);
-  
+
   return [rook, knight, bishop, pawn];
 };
 
@@ -112,7 +112,7 @@ const BackgroundScene = () => {
   );
 };
 
-BackgroundPieces.displayName = "BackgroundPieces";
+BackgroundPieces.displayName = 'BackgroundPieces';
 export default BackgroundScene;
 
 const SceneContainer = tw.div`

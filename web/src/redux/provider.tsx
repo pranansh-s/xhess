@@ -6,8 +6,9 @@ import UserService from '@/services/user.service';
 import { onAuthStateChanged } from 'firebase/auth';
 import { Provider } from 'react-redux';
 
-import { auth } from '@/lib/firebase';
 import { setAccessToken } from '@/lib/utils/auth';
+
+import { auth } from '@/lib/firebase';
 
 import { store } from './store';
 

@@ -5,9 +5,9 @@ import { Profile } from '@xhess/shared/schemas';
 
 import { axiosConfig } from '@/constants/config';
 
-import { handleAPIErrors } from './utils/error';
-import { getAccessToken } from './utils/auth';
 import { auth } from './firebase';
+import { getAccessToken } from './utils/auth';
+import { handleAPIErrors } from './utils/error';
 
 const client = axios.create(axiosConfig);
 

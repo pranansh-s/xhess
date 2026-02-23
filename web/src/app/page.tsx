@@ -11,7 +11,7 @@ import { useAppSelector } from '@/redux/hooks';
 
 export default function Home() {
   const activeModal = useAppSelector(state => state.modals);
-  
+
   return (
     <>
       <Canvas>

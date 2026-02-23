@@ -14,7 +14,7 @@ const Chat = memo(() => {
   );
 });
 
-Chat.displayName = "Chat";
+Chat.displayName = 'Chat';
 export default Chat;
 
 const ChatContainer = tw.div`
