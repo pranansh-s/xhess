@@ -11,22 +11,20 @@ import { createRoom } from '@/lib/utils/room';
 
 import Button from '@/components/common/Button';
 
-import { auth } from '@/lib/firebase';
 import { openModal } from '@/redux/features/modalSlice';
+import { useAppSelector } from '@/redux/hooks';
 
 const Options = () => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
+  const user = useAppSelector(state => state.user);
+  const isLoggedIn = user !== null;
 
   const dispatch = useDispatch();
 
   const handleCreateRoom = useCallback(async () => {
-    if (!auth.currentUser) {
-      router.push('/login');
-      return;
-    }
+    if (!isLoggedIn) return;
 
-    //create a possible loading hook that turns on promsise resolve
     setLoading(true);
     try {
       const key = await createRoom();
@@ -45,10 +43,18 @@ const Options = () => {
   return (
     <OptionsContainer>
       <Heading>Xhess</Heading>
-      <Button onClick={handleCreateRoom} isLoading={loading} disabled={loading} themeColor="blue">
-        create room
-      </Button>
-      <Button onClick={handleRoomJoinModal}>join room</Button>
+      {isLoggedIn ? (
+        <>
+          <Button onClick={handleCreateRoom} isLoading={loading} disabled={loading} themeColor="blue">
+            create room
+          </Button>
+          <Button onClick={handleRoomJoinModal}>join room</Button>
+        </>
+      ) : (
+        <Button link="/login" themeColor="blue">
+          sign in
+        </Button>
+      )}
     </OptionsContainer>
   );
 };

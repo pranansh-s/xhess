@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import { signInWithEmailAndPassword } from 'firebase/auth';
@@ -69,6 +70,12 @@ export default function LoginPage() {
       <Button type="submit" onClick={onLoginAsync} disabled={hasErrors || loading} isLoading={loading}>
         login
       </Button>
+      <p className="text-center font-serif text-secondary">
+        don&apos;t have an account?{' '}
+        <Link href="/register" className="font-bold text-blue-300 underline transition-colors hover:text-blue-200">
+          register
+        </Link>
+      </p>
     </>
   );
 }
