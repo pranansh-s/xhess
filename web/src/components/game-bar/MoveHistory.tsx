@@ -16,7 +16,7 @@ const MoveHistory = () => {
   return (
     <MoveHistoryContainer className="striped">
       {moveList.map((move, idx) => (
-        <MoveItem onClick={handleGoToMove(idx)} key={idx}>
+        <MoveItem onClick={() => handleGoToMove(idx)} key={idx}>
           <span>{idx + 1}.</span>
           <span>{move}</span>
         </MoveItem>

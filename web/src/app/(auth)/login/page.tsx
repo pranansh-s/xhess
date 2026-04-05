@@ -27,7 +27,7 @@ export default function LoginPage() {
   const { formState, setFormState, handleInputChange, hasErrors } = useForm();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onLoginAsync = async (e: React.FormEvent) => {
+  const onLoginAsync = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
 

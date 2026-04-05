@@ -11,6 +11,8 @@ import { useAppSelector } from '@/redux/hooks';
 
 export default function Home() {
   const activeModal = useAppSelector(state => state.modals);
+  const user = useAppSelector(state => state.user);
+  const isLoggedIn = user !== null;
 
   return (
     <>
@@ -31,7 +33,7 @@ export default function Home() {
         />
         <Lighting />
       </Canvas>
-      {activeModal === 'joinRoom' && <JoinRoom />}
+      {isLoggedIn && activeModal === 'joinRoom' && <JoinRoom />}
       <Options />
     </>
   );

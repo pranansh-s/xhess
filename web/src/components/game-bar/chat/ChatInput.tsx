@@ -57,11 +57,10 @@ const ChatInput = () => {
     <InputArea>
       <InputField
         value={message}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMessage(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setMessage(e.target.value)}
         onKeyDown={handleKeyDown}
         name="message"
         rows="1"
-        type="text"
         placeholder={strings.room.messagePlaceholder}
       />
       <SendButton

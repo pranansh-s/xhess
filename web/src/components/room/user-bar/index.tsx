@@ -22,7 +22,7 @@ const UserBar = ({ timer, profile, isUser }: IUserBarProps) => {
   return (
     <UserBarContainer>
       <ProfileContainer>
-        <Image src={profile?.photo ?? avatar} width={32} height={32} alt="profile" />
+        <Image src={profile?.photo || avatar} width={32} height={32} alt="profile" />
         <span className="text-lg">{profile?.displayName}</span>
       </ProfileContainer>
       <Timer left={timer ?? 1800000} ticking={shouldTick} />

@@ -53,8 +53,6 @@ const ShowGameBar = tw.button`
   absolute
   left-1/2
   block
-  text-9xl
-  text-white
   aspect-square
   w-40
   -translate-x-1/2
@@ -62,6 +60,8 @@ const ShowGameBar = tw.button`
   rounded-full
   border-4
   bg-primary
+  text-9xl
+  text-white
   lg:hidden
 `;
 

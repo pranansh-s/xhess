@@ -134,7 +134,7 @@ export const willMoveCheck = (board: Board, move: Move, kingColor: Color): boole
     const newX = kingPos.x + dx;
     const newY = kingPos.y + dy;
 
-    if (newX < 0 || newX >= 8 || newY < 0 || newY >= 8) break;
+    if (newX < 0 || newX >= 8 || newY < 0 || newY >= 8) continue;
 
     if (newBoard[newY][newX] && newBoard[newY][newX].color !== kingColor) {
       if (newBoard[newY][newX].type === 'knight') return true;

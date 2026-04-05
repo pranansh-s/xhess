@@ -28,7 +28,7 @@ export default function RegisterPage() {
   const { formState, setFormState, handleInputChange, hasErrors } = useForm();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onRegisterAsync = async (e: React.FormEvent) => {
+  const onRegisterAsync = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setLoading(true);
 

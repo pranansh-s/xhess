@@ -23,8 +23,6 @@ const Options = () => {
   const dispatch = useDispatch();
 
   const handleCreateRoom = useCallback(async () => {
-    if (!isLoggedIn) return;
-
     setLoading(true);
     try {
       const key = await createRoom();
@@ -51,9 +49,14 @@ const Options = () => {
           <Button onClick={handleRoomJoinModal}>join room</Button>
         </>
       ) : (
-        <Button link="/login" themeColor="blue">
-          sign in
-        </Button>
+        <>
+          <Button link="/login" themeColor="blue">
+            sign in
+          </Button>
+          <Button link="/register" themeColor="green">
+            register
+          </Button>
+        </>
       )}
     </OptionsContainer>
   );
