@@ -16,8 +16,15 @@ const roomToGameId = new Map<string, string>();
 const chessCache = new Map<string, ChessService>();
 
 const GameService = {
-  getGameId: (roomId: string): string => {
-    const gameId = roomToGameId.get(roomId);
+  getGameId: async (roomId: string): Promise<string> => {
+    let gameId = roomToGameId.get(roomId);
+    if (!gameId) {
+      const room = await RoomService.getRoom(roomId);
+      if (room && room.gameId) {
+        gameId = room.gameId;
+        roomToGameId.set(roomId, gameId);
+      }
+    }
     if (!gameId) {
       throw new ServiceError('No game in room');
     }
@@ -37,12 +44,26 @@ const GameService = {
   },
 
   addMove: async (roomId: string, move: Move): Promise<Game> => {
-    const gameId = GameService.getGameId(roomId);
+    const gameId = await GameService.getGameId(roomId);
     const game = await GameService.getGame(gameId);
 
     const isPlaying = game.state === 'isPlaying';
     if (!isPlaying) {
       throw new ServiceError('Game is not in playing state');
+    }
+
+    const now = Date.now();
+    const timeElapsed = now - game.lastPlayedAt;
+    const currentPlayerState = game.playerTurn === 'white' ? game.whiteSidePlayer : game.blackSidePlayer;
+    if (currentPlayerState) {
+      const remainingBeforeMove = currentPlayerState.remainingTime - timeElapsed;
+      if (remainingBeforeMove <= 0) {
+        currentPlayerState.remainingTime = 0;
+        game.state = game.playerTurn === 'white' ? 'blackWin' : 'whiteWin';
+        game.lastPlayedAt = now;
+        await GameService.saveGame(game, gameId);
+        return game;
+      }
     }
 
     const chess = chessCache.get(gameId) || new ChessService(game);
@@ -61,7 +82,7 @@ const GameService = {
   },
 
   updateRemainingTime: async (roomId: string) => {
-    const gameId = GameService.getGameId(roomId);
+    const gameId = await GameService.getGameId(roomId);
     const game = await GameService.getGame(gameId);
 
     updateTimeLeft(game, false);
@@ -69,7 +90,7 @@ const GameService = {
   },
 
   joinGame: async (roomId: string, userId: string): Promise<Game> => {
-    const gameId = GameService.getGameId(roomId);
+    const gameId = await GameService.getGameId(roomId);
     const game = await GameService.getGame(gameId);
 
     if (game.whiteSidePlayer?.userId === userId || game.blackSidePlayer?.userId === userId) {
@@ -131,6 +152,11 @@ const GameService = {
     roomToGameId.set(roomId, uuid);
 
     await GameService.saveGame(newGame, uuid);
+
+    const room = await RoomService.getRoom(roomId);
+    room.gameId = uuid;
+    await RoomService.saveRoom(roomId, room);
+
     return newGame;
   },
 };

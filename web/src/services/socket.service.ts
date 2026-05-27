@@ -4,6 +4,7 @@ import { Profile } from '@xhess/shared/schemas';
 import { ChatMessage, Game, GameConfig, Move } from '@xhess/shared/types';
 
 import { showErrorToast } from '@/components/common/ErrorToast';
+import { auth } from '@/lib/firebase';
 
 import { initMoves, movePiece } from '@/redux/features/boardSlice';
 import { addMessage } from '@/redux/features/chatSlice';
@@ -11,6 +12,7 @@ import {
   blackPlayerUpdate,
   endTurn,
   initGameState,
+  updateGameState,
   setOpponentProfile,
   whitePlayerUpdate,
 } from '@/redux/features/gameSlice';
@@ -21,6 +23,15 @@ const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL);
 
 const SocketService = {
   initSocket: (roomId: string, userId: string, dispatch: AppDispatch) => {
+    if (!socket.connected) {
+      socket.connect();
+    }
+
+    socket.off('error');
+    socket.off('receiveChatMessage');
+    socket.off('gameJoined');
+    socket.off('moveUpdate');
+
     socket.on('error', (message: string) => {
       showErrorToast('Failed to process task', message);
     });
@@ -39,12 +50,19 @@ const SocketService = {
         throw new Error('No move to update');
       }
 
+      dispatch(updateGameState(game));
       SocketService.updatePlayerState(dispatch, game);
       dispatch(movePiece(move));
       dispatch(endTurn());
     });
 
-    socket.emit('joinRoom', roomId, userId);
+    auth.currentUser?.getIdToken()
+      .then((token) => {
+        socket.emit('joinRoom', roomId, userId, token);
+      })
+      .catch(() => {
+        showErrorToast('Failed to process task', 'Authentication failed');
+      });
   },
 
   initGame: (dispatch: AppDispatch, game: Game, profile: Profile | null) => {

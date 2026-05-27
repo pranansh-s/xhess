@@ -28,7 +28,13 @@ const RoomService = {
   },
 
   createRoom: async (userId: string): Promise<string> => {
-    const roomId = generateRoomKey(activeRoomIds);
+    let roomId = generateRoomKey(activeRoomIds);
+    let existingRoom = await dbController.loadData<Room>(ROOM_PREFIX, roomId).catch(() => null);
+    while (existingRoom) {
+      roomId = generateRoomKey(activeRoomIds);
+      existingRoom = await dbController.loadData<Room>(ROOM_PREFIX, roomId).catch(() => null);
+    }
+
     const createdRoom: Room = {
       createdBy: userId,
       participants: [userId],

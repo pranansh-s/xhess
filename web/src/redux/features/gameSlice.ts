@@ -2,11 +2,12 @@ import UserService from '@/services/user.service';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { Profile } from '@xhess/shared/schemas';
-import { Color, Game, GameType, PlayerState } from '@xhess/shared/types';
+import { Color, Game, GameState, GameType, PlayerState } from '@xhess/shared/types';
 
 const initialState = {
   isTurn: true,
   isPlaying: false,
+  state: 'isWaiting' as GameState,
   playerSide: 'white' as Color,
   gameType: '30m' as GameType,
   players: {
@@ -37,12 +38,25 @@ const gameSlice = createSlice({
         playerSide,
         gameType,
         isPlaying: state == 'isPlaying',
+        state,
         players: {
           whiteSidePlayer,
           blackSidePlayer,
         },
         opponentProfile: null,
       };
+    },
+
+    updateGameState: (state, action: PayloadAction<Game>) => {
+      const { state: newState, whiteSidePlayer, blackSidePlayer } = action.payload;
+      state.state = newState;
+      state.isPlaying = newState === 'isPlaying';
+      if (whiteSidePlayer) {
+        state.players.whiteSidePlayer = whiteSidePlayer;
+      }
+      if (blackSidePlayer) {
+        state.players.blackSidePlayer = blackSidePlayer;
+      }
     },
 
     whitePlayerUpdate: (state, action: PayloadAction<PlayerState>) => {
@@ -63,6 +77,13 @@ const gameSlice = createSlice({
   },
 });
 
-export const { initGameState, whitePlayerUpdate, setOpponentProfile, blackPlayerUpdate, endTurn } = gameSlice.actions;
+export const {
+  initGameState,
+  updateGameState,
+  whitePlayerUpdate,
+  setOpponentProfile,
+  blackPlayerUpdate,
+  endTurn,
+} = gameSlice.actions;
 
 export default gameSlice.reducer;

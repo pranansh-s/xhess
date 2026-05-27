@@ -1,4 +1,5 @@
 import { Socket } from 'socket.io';
+import admin from 'firebase-admin';
 import { ZodError } from 'zod';
 
 import { GameConfig, Move } from '@xhess/shared/types';
@@ -36,7 +37,20 @@ export const socketHandlers = (socket: Socket) => {
   let currentUserId: string | null = null;
 
   return {
-    joinRoom: async (roomId: string, userId: string) => {
+    joinRoom: async (roomId: string, userId: string, token?: string) => {
+      if (!token) {
+        throw new ServiceError('Unauthorized: Identity verification required');
+      }
+
+      try {
+        const decoded = await admin.auth().verifyIdToken(token);
+        if (decoded.uid !== userId) {
+          throw new ServiceError('Unauthorized: Client-Server identity mismatch');
+        }
+      } catch (err) {
+        throw new ServiceError('Unauthorized: Invalid or expired access credentials');
+      }
+
       if (currentRoomId && currentRoomId !== roomId) {
         await RoomService.leaveRoom(currentRoomId, userId);
         socket.leave(currentRoomId);
