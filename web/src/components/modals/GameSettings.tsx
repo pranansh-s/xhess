@@ -101,7 +101,7 @@ const GameSettings = memo(() => {
           <Canvas>
             <Lighting />
             <AnimatedChessModel
-              color="#ffffff"
+              color="#121212"
               rotation={[0, 0, -0.8]}
               targetRotation={0.8}
               animate={hoveredSide == 'white' || selectedSide == 'white'}
@@ -125,7 +125,7 @@ const GameSettings = memo(() => {
               animate={hoveredSide == 'random' || selectedSide == 'random'}
             />
             <AnimatedChessModel
-              color="#ffffff"
+              color="#121212"
               position={[0.25, -0.25, 0]}
               rotation={[0, 0, 0.8]}
               targetRotation={-0.8}

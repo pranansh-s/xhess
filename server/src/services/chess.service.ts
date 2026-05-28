@@ -1,5 +1,3 @@
-//TODO: - DI in services, decrease procedural code, validation separately, better abstraction?, better error handling?
-
 import { Board, Color, Game, Move, Piece, Position } from '@xhess/shared/types';
 import { boardAfterMove, createBoard, getValidMovesForPiece, isKingInCheck } from '@xhess/shared/utils';
 

@@ -31,7 +31,7 @@ const FloatingModel = ({
   rotationSpeed,
 }: IFloatingModelProps) => {
   const ref = useRef<Group>(null);
-  const instance = useMemo(() => createColoredModel(model, color ? '#ffffff' : '#000000'), [model, color]);
+  const instance = useMemo(() => createColoredModel(model, color ? '#e7e2d9' : '#121212'), [model, color]);
   const { viewport } = useThree();
 
   const currentSpeed = useRef([...movementSpeed]);
@@ -104,7 +104,8 @@ const BackgroundPieces = memo(() => {
 const BackgroundScene = () => {
   return (
     <SceneContainer>
-      <Canvas>
+      <Canvas gl={{ toneMappingExposure: 1.28 }}>
+        <fog attach="fog" args={['#02191d', 12, 30]} />
         <BackgroundPieces />
         <Lighting />
       </Canvas>
@@ -122,7 +123,5 @@ const SceneContainer = tw.div`
   -z-10
   h-screen
   w-screen
-  bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))]
-  from-primary
-  to-transparent
+  bg-[radial-gradient(circle_at_center,_rgba(45,185,205,0.22)_0%,_rgba(20,65,78,0.22)_32%,_rgba(10,24,30,0.42)_68%,_rgba(6,14,18,0.72)_100%),radial-gradient(circle_at_top,_rgba(120,220,235,0.08),_transparent_38%)]
 `;

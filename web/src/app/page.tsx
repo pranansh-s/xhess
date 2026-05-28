@@ -19,14 +19,14 @@ export default function Home() {
       <Canvas>
         <ChessModel
           modelPath="models/king.fbx"
-          color="#000000"
+          color="#121212"
           position={[0.2, 0.7, 0]}
           rotation={[0, 0, 0.8]}
           scale={0.003}
         />
         <ChessModel
           modelPath="models/queen.fbx"
-          color="#ffffff"
+          color="#e7e2d9"
           position={[-0.2, 0.7, 0.25]}
           rotation={[0, 0, -0.8]}
           scale={0.003}

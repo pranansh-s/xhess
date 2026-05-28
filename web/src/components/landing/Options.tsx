@@ -76,6 +76,7 @@ const OptionsContainer = tw.div`
 `;
 
 const Heading = tw.h1`
+  text-shadow:-2px_-2px_1px_#000,2px_-2px_1px_#000,-2px_2px_1px_#000,2px_2px_1px_#000]
   select-none
   px-3
   py-2
@@ -86,9 +87,10 @@ const Heading = tw.h1`
   text-white
   duration-200
   ease-in-out
-  [text-shadow:-2px_-2px_1px_#000,2px_-2px_1px_#000,-2px_2px_1px_#000,2px_2px_1px_#000]
   first-letter:text-black
+  first-letter:[text-shadow:-1px_-1px_1px_#fff,1px_-1px_1px_#fff,-1px_1px_1px_#fff,1px_1px_1px_#fff]
   hover:text-black
   hover:[text-shadow:-1px_-1px_1px_#fff,1px_-1px_1px_#fff,-1px_1px_1px_#fff,1px_1px_1px_#fff]
   hover:first-letter:text-white
+  hover:first-letter:[text-shadow:-1px_-1px_1px_#000,1px_-1px_1px_#000,-1px_1px_1px_#000,1px_1px_1px_#000]
 `;

@@ -153,8 +153,6 @@ export const socketHandlers = (socket: Socket) => {
 
       socket.emit(SocketEvent.MOVE_UPDATE, game);
       socket.to(currentRoomId).emit(SocketEvent.MOVE_UPDATE, game);
-
-      // Notify the opponent who initiated the draw offer that it was declined
       socket.to(currentRoomId).emit(SocketEvent.DRAW_OFFER_REJECTED);
     },
 

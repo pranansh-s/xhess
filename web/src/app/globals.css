@@ -3,26 +3,19 @@
 @tailwind utilities;
 
 :root {
-  --primary: #086972;
-  --secondary: #daeaf6;
-  --tertiary: #071a52;
+  --primary: #14808b;
+  --secondary: #e8f1f5;
+  --tertiary: #12313a;
 
   --font-merriweather: 'Limelight', serif;
   --font-merriweather-sans: 'Merriweather Sans', sans-serif;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --primary: #086972;
-    --secondary: #daeaf6;
-    --tertiary: #040f31;
-  }
 }
 
 @layer utilities {
   .striped li:nth-child(even) {
     @apply bg-zinc-600 text-secondary;
   }
+
   .striped li:nth-child(odd) {
     @apply bg-white text-tertiary;
   }

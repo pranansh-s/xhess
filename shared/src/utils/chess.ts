@@ -50,7 +50,6 @@ export const getValidMovesForPiece = (board: Board, piece: Piece, player: Color,
           }
         });
 
-        // En-passant
         if (moves.length > 0) {
           const lastMove = moves[moves.length - 1];
           const lastMovePiece = board[lastMove.to.y][lastMove.to.x];
@@ -85,12 +84,10 @@ export const getValidMovesForPiece = (board: Board, piece: Piece, player: Color,
     case 'king':
       getMovesAlongDirection([...CARDINAL_DIRECTIONS, ...DIAGONAL_DIRECTIONS], 1);
 
-      // Castling
       const kingStartRow = player === 'white' ? 7 : 0;
       if (y === kingStartRow && x === 4) {
         const hasKingMoved = moves.some(m => m.from.x === 4 && m.from.y === kingStartRow);
         if (!hasKingMoved && !isKingInCheck(board, player)) {
-          // King-side (O-O)
           const kingRook = board[kingStartRow][7];
           if (kingRook && kingRook.type === 'rook' && kingRook.color === player) {
             const hasKingRookMoved = moves.some(m => m.from.x === 7 && m.from.y === kingStartRow);
@@ -105,7 +102,6 @@ export const getValidMovesForPiece = (board: Board, piece: Piece, player: Color,
             }
           }
 
-          // Queen-side (O-O-O)
           const queenRook = board[kingStartRow][0];
           if (queenRook && queenRook.type === 'rook' && queenRook.color === player) {
             const hasQueenRookMoved = moves.some(m => m.from.x === 0 && m.from.y === kingStartRow);
