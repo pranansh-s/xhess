@@ -47,6 +47,17 @@ const GameService = {
     const gameId = await GameService.getGameId(roomId);
     const game = await GameService.getGame(gameId);
 
+    const lastMove = game.moves[game.moves.length - 1];
+    const isDuplicate = lastMove &&
+      lastMove.from.x === move.from.x &&
+      lastMove.from.y === move.from.y &&
+      lastMove.to.x === move.to.x &&
+      lastMove.to.y === move.to.y;
+
+    if (isDuplicate) {
+      return game;
+    }
+
     const isPlaying = game.state === 'isPlaying';
     if (!isPlaying) {
       throw new ServiceError('Game is not in playing state');

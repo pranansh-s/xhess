@@ -19,24 +19,35 @@ class DatabaseController {
     return this.instance;
   }
 
-  //propogate firebase console delete or modify for cache
   loadData = async <T extends object>(prefix: string, id: string): Promise<T | null> => {
     const cacheKey = `${prefix}:${id}`;
+    let cachedData: T | null = null;
+    
     try {
-      const cachedData = await this.redis.getItem<T>(cacheKey);
-      if (cachedData) {
-        return cachedData;
-      }
+      cachedData = await this.redis.getItem<T>(cacheKey);
+    } catch (err) {
+      console.warn(`Redis read failed for ${cacheKey}. Falling back directly to Firestore:`, err);
+    }
 
+    if (cachedData) {
+      return cachedData;
+    }
+
+    try {
       const data = await this.firebase.getDoc<T>(prefix, id);
       if (!data) {
         return null;
       }
-      await this.redis.setItem<T>(cacheKey, data);
-
+      
+      try {
+        await this.redis.setItem<T>(cacheKey, data);
+      } catch (err) {
+        console.warn(`Redis cache update failed for ${cacheKey}:`, err);
+      }
+      
       return data;
     } catch (err) {
-      console.error(`Database load operation failed for ${prefix}/${id}`);
+      console.error(`Database load operation failed for Firestore at ${prefix}/${id}:`, err);
       throw new DatabaseError();
     }
   };
@@ -45,10 +56,15 @@ class DatabaseController {
     const cacheKey = `${prefix}:${id}`;
     try {
       await this.firebase.setDoc<T>(prefix, id, data);
+    } catch (err) {
+      console.error(`Database save operation failed for Firestore at ${prefix}/${id}:`, err);
+      throw new DatabaseError();
+    }
+
+    try {
       await this.redis.setItem<T>(cacheKey, data);
     } catch (err) {
-      console.error(`Database save operation failed for ${prefix}/${id}`);
-      throw new DatabaseError();
+      console.warn(`Redis cache update failed for ${cacheKey}:`, err);
     }
   };
 
@@ -56,10 +72,15 @@ class DatabaseController {
     const cacheKey = `${prefix}:${id}`;
     try {
       await this.firebase.removeDoc(prefix, id);
+    } catch (err) {
+      console.error(`Database delete operation failed for Firestore at ${prefix}/${id}:`, err);
+      throw new DatabaseError();
+    }
+
+    try {
       await this.redis.removeItem(cacheKey);
     } catch (err) {
-      console.error(`Database delete operation failed for ${prefix}/${id}`);
-      throw new DatabaseError();
+      console.warn(`Redis cache evict failed for ${cacheKey}:`, err);
     }
   };
 }

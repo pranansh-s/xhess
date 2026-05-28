@@ -56,6 +56,8 @@ export const socketHandlers = (socket: Socket) => {
         socket.leave(currentRoomId);
       }
 
+      await RoomService.joinRoom(roomId, userId).catch(() => null);
+
       socket.join(roomId);
       currentRoomId = roomId;
       currentUserId = userId;
