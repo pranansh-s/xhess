@@ -1,11 +1,13 @@
 'use client';
 
 import { memo } from 'react';
+
+import SocketService from '@/services/socket.service';
 import tw from 'tailwind-styled-components';
 
-import { useAppDispatch } from '@/redux/hooks';
 import { closeModal } from '@/redux/features/modalSlice';
-import SocketService from '@/services/socket.service';
+import { useAppDispatch } from '@/redux/hooks';
+
 import Button from '../common/Button';
 import ModalContainer from './Modal';
 
@@ -63,17 +65,17 @@ const TitleText = tw.h2`
 `;
 
 const OfferMessage = tw.span`
+  mb-2
+  font-sans
   text-lg
   text-secondary
   opacity-80
-  font-sans
-  mb-2
 `;
 
 const ButtonsContainer = tw.div`
   flex
-  flex-row
-  gap-6
   w-full
+  flex-row
   justify-center
+  gap-6
 `;

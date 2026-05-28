@@ -41,5 +41,23 @@ export const boardAfterMove = (board: Board, move: Move, piece: Piece) => {
   }
   newBoard[from.y][from.x] = null;
 
+  const isCastling = piece.type === 'king' && Math.abs(to.x - from.x) === 2;
+  if (isCastling) {
+    const isKingSide = to.x > from.x;
+    const rookFromX = isKingSide ? 7 : 0;
+    const rookToX = isKingSide ? 5 : 3;
+    const rookY = piece.color === 'white' ? 7 : 0;
+    const rook = newBoard[rookY][rookFromX];
+    if (rook) {
+      newBoard[rookY][rookToX] = { ...rook, pos: { x: rookToX, y: rookY } };
+      newBoard[rookY][rookFromX] = null;
+    }
+  }
+
+  const isEnPassant = piece.type === 'pawn' && Math.abs(to.x - from.x) === 1 && !board[to.y][to.x];
+  if (isEnPassant) {
+    newBoard[from.y][to.x] = null;
+  }
+
   return newBoard;
 };

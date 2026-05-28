@@ -8,9 +8,7 @@ import { ForbiddenError, ServiceError, UnauthorizedError } from './utils/error.j
 
 export const appCors = cors({
   origin: (origin, callback) => {
-    const allowedOrigins = process.env.CORS_ORIGIN
-      ? process.env.CORS_ORIGIN.split(',')
-      : ['http://localhost:3000'];
+    const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : ['http://localhost:3000'];
     if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       callback(null, true);
     } else {

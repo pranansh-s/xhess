@@ -1,24 +1,24 @@
+import UserService from '@/services/user.service';
 import { io } from 'socket.io-client';
 
 import { Profile } from '@xhess/shared/schemas';
-import { ChatMessage, Game, GameConfig, Move } from '@xhess/shared/types';
+import { ChatMessage, Game, GameConfig, Move, SocketEvent } from '@xhess/shared/types';
 
 import { showErrorToast } from '@/components/common/ErrorToast';
-import { auth } from '@/lib/firebase';
 
+import { auth } from '@/lib/firebase';
 import { initMoves, movePiece } from '@/redux/features/boardSlice';
 import { addMessage } from '@/redux/features/chatSlice';
 import {
   blackPlayerUpdate,
   endTurn,
   initGameState,
-  updateGameState,
   setOpponentProfile,
+  updateGameState,
   whitePlayerUpdate,
 } from '@/redux/features/gameSlice';
 import { closeModal, openModal } from '@/redux/features/modalSlice';
 import { AppDispatch, store } from '@/redux/store';
-import UserService from '@/services/user.service';
 
 const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL);
 
@@ -28,25 +28,25 @@ const SocketService = {
       socket.connect();
     }
 
-    socket.off('error');
-    socket.off('receiveChatMessage');
-    socket.off('gameJoined');
-    socket.off('moveUpdate');
-    socket.off('drawOfferRejected');
+    socket.off(SocketEvent.ERROR);
+    socket.off(SocketEvent.RECEIVE_CHAT_MESSAGE);
+    socket.off(SocketEvent.GAME_JOINED);
+    socket.off(SocketEvent.MOVE_UPDATE);
+    socket.off(SocketEvent.DRAW_OFFER_REJECTED);
 
-    socket.on('error', (message: string) => {
+    socket.on(SocketEvent.ERROR, (message: string) => {
       showErrorToast('Failed to process task', message);
     });
 
-    socket.on('receiveChatMessage', (newChatMessage: ChatMessage) => {
+    socket.on(SocketEvent.RECEIVE_CHAT_MESSAGE, (newChatMessage: ChatMessage) => {
       dispatch(addMessage(newChatMessage));
     });
 
-    socket.on('gameJoined', (joinedGame: Game, opponentProfile: Profile | null) => {
+    socket.on(SocketEvent.GAME_JOINED, (joinedGame: Game, opponentProfile: Profile | null) => {
       SocketService.initGame(dispatch, joinedGame, opponentProfile);
     });
 
-    socket.on('moveUpdate', (game: Game) => {
+    socket.on(SocketEvent.MOVE_UPDATE, (game: Game) => {
       dispatch(updateGameState(game));
       SocketService.updatePlayerState(dispatch, game);
 
@@ -71,13 +71,14 @@ const SocketService = {
       }
     });
 
-    socket.on('drawOfferRejected', () => {
+    socket.on(SocketEvent.DRAW_OFFER_REJECTED, () => {
       showErrorToast('Draw Offer Declined', 'Your opponent has declined the draw offer.');
     });
 
-    auth.currentUser?.getIdToken()
-      .then((token) => {
-        socket.emit('joinRoom', roomId, userId, token);
+    auth.currentUser
+      ?.getIdToken()
+      .then(token => {
+        socket.emit(SocketEvent.JOIN_ROOM, roomId, userId, token);
       })
       .catch(() => {
         showErrorToast('Failed to process task', 'Authentication failed');
@@ -112,31 +113,31 @@ const SocketService = {
   },
 
   surrender: () => {
-    socket.emit('surrender');
+    socket.emit(SocketEvent.SURRENDER);
   },
 
   offerDraw: () => {
-    socket.emit('offerDraw');
+    socket.emit(SocketEvent.OFFER_DRAW);
   },
 
   acceptDraw: () => {
-    socket.emit('acceptDraw');
+    socket.emit(SocketEvent.ACCEPT_DRAW);
   },
 
   rejectDraw: () => {
-    socket.emit('rejectDraw');
+    socket.emit(SocketEvent.REJECT_DRAW);
   },
 
   sendMessage: (message: string) => {
-    socket.emit('sendChatMessage', message);
+    socket.emit(SocketEvent.SEND_CHAT_MESSAGE, message);
   },
 
   newGame: (config: GameConfig) => {
-    socket.emit('newGame', config);
+    socket.emit(SocketEvent.NEW_GAME, config);
   },
 
   makeMove: (move: Move) => {
-    socket.emit('newMove', move);
+    socket.emit(SocketEvent.NEW_MOVE, move);
   },
 
   leaveRoom: () => {

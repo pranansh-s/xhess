@@ -22,7 +22,7 @@ class DatabaseController {
   loadData = async <T extends object>(prefix: string, id: string): Promise<T | null> => {
     const cacheKey = `${prefix}:${id}`;
     let cachedData: T | null = null;
-    
+
     try {
       cachedData = await this.redis.getItem<T>(cacheKey);
     } catch (err) {
@@ -38,13 +38,13 @@ class DatabaseController {
       if (!data) {
         return null;
       }
-      
+
       try {
         await this.redis.setItem<T>(cacheKey, data);
       } catch (err) {
         console.warn(`Redis cache update failed for ${cacheKey}:`, err);
       }
-      
+
       return data;
     } catch (err) {
       console.error(`Database load operation failed for Firestore at ${prefix}/${id}:`, err);

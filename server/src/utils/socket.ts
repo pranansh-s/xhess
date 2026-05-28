@@ -1,8 +1,8 @@
-import { Socket } from 'socket.io';
 import admin from 'firebase-admin';
+import { Socket } from 'socket.io';
 import { ZodError } from 'zod';
 
-import { GameConfig, Move } from '@xhess/shared/types';
+import { GameConfig, Move, SocketEvent } from '@xhess/shared/types';
 
 import GameService from '../services/game.service.js';
 import ProfileService from '../services/profile.service.js';
@@ -17,16 +17,16 @@ export const handleErrors = (handler: (...args: any[]) => Promise<void>, socket:
     } catch (err) {
       if (err instanceof ZodError) {
         console.error('[SOCKET_ERROR]', title, err.issues.map(issue => issue.message).join(', '));
-        socket.emit('error', `${err.issues[0].path}: ${err.issues[0].message}`);
+        socket.emit(SocketEvent.ERROR, `${err.issues[0].path}: ${err.issues[0].message}`);
       } else if (err instanceof ServiceError) {
         console.error('[SOCKET_ERROR]', title, err.message);
-        socket.emit('error', err.message);
+        socket.emit(SocketEvent.ERROR, err.message);
       } else if (err instanceof DatabaseError) {
         console.error('[SOCKET_ERROR]', title, err.message);
-        socket.emit('error', 'Internal Server Error');
+        socket.emit(SocketEvent.ERROR, 'Internal Server Error');
       } else {
         console.error('[SOCKET_ERROR]', title, err);
-        socket.emit('error', 'Internal Server Error');
+        socket.emit(SocketEvent.ERROR, 'Internal Server Error');
       }
     }
   };
@@ -69,8 +69,8 @@ export const socketHandlers = (socket: Socket) => {
       if (game) {
         const { myProfile, opponentProfile } = await ProfileService.getPlayerProfiles(currentRoomId, currentUserId);
 
-        socket.emit('gameJoined', game, opponentProfile);
-        socket.to(currentRoomId).emit('gameJoined', game, myProfile);
+        socket.emit(SocketEvent.GAME_JOINED, game, opponentProfile);
+        socket.to(currentRoomId).emit(SocketEvent.GAME_JOINED, game, myProfile);
       }
     },
 
@@ -79,8 +79,8 @@ export const socketHandlers = (socket: Socket) => {
 
       const message = await RoomService.sendMessage(currentRoomId, currentUserId, content);
 
-      socket.emit('receiveChatMessage', message);
-      socket.to(currentRoomId).emit('receiveChatMessage', message);
+      socket.emit(SocketEvent.RECEIVE_CHAT_MESSAGE, message);
+      socket.to(currentRoomId).emit(SocketEvent.RECEIVE_CHAT_MESSAGE, message);
     },
 
     newGame: async (config: GameConfig) => {
@@ -89,8 +89,8 @@ export const socketHandlers = (socket: Socket) => {
       const newGame = await GameService.createGame(config, currentRoomId, currentUserId);
       const { myProfile, opponentProfile } = await ProfileService.getPlayerProfiles(currentRoomId, currentUserId);
 
-      socket.emit('gameJoined', newGame, opponentProfile);
-      socket.to(currentRoomId).emit('gameJoined', newGame, myProfile);
+      socket.emit(SocketEvent.GAME_JOINED, newGame, opponentProfile);
+      socket.to(currentRoomId).emit(SocketEvent.GAME_JOINED, newGame, myProfile);
     },
 
     newMove: async (move: Move) => {
@@ -98,8 +98,8 @@ export const socketHandlers = (socket: Socket) => {
 
       const game = await GameService.addMove(currentRoomId, move);
 
-      socket.emit('moveUpdate', game);
-      socket.to(currentRoomId).emit('moveUpdate', game);
+      socket.emit(SocketEvent.MOVE_UPDATE, game);
+      socket.to(currentRoomId).emit(SocketEvent.MOVE_UPDATE, game);
     },
 
     surrender: async () => {
@@ -107,8 +107,8 @@ export const socketHandlers = (socket: Socket) => {
 
       const game = await GameService.surrenderGame(currentRoomId, currentUserId);
 
-      socket.emit('moveUpdate', game);
-      socket.to(currentRoomId).emit('moveUpdate', game);
+      socket.emit(SocketEvent.MOVE_UPDATE, game);
+      socket.to(currentRoomId).emit(SocketEvent.MOVE_UPDATE, game);
     },
 
     offerDraw: async () => {
@@ -116,8 +116,8 @@ export const socketHandlers = (socket: Socket) => {
 
       const game = await GameService.offerDrawGame(currentRoomId, currentUserId);
 
-      socket.emit('moveUpdate', game);
-      socket.to(currentRoomId).emit('moveUpdate', game);
+      socket.emit(SocketEvent.MOVE_UPDATE, game);
+      socket.to(currentRoomId).emit(SocketEvent.MOVE_UPDATE, game);
     },
 
     acceptDraw: async () => {
@@ -125,8 +125,8 @@ export const socketHandlers = (socket: Socket) => {
 
       const game = await GameService.acceptDrawGame(currentRoomId, currentUserId);
 
-      socket.emit('moveUpdate', game);
-      socket.to(currentRoomId).emit('moveUpdate', game);
+      socket.emit(SocketEvent.MOVE_UPDATE, game);
+      socket.to(currentRoomId).emit(SocketEvent.MOVE_UPDATE, game);
     },
 
     rejectDraw: async () => {
@@ -134,11 +134,11 @@ export const socketHandlers = (socket: Socket) => {
 
       const game = await GameService.rejectDrawGame(currentRoomId, currentUserId);
 
-      socket.emit('moveUpdate', game);
-      socket.to(currentRoomId).emit('moveUpdate', game);
+      socket.emit(SocketEvent.MOVE_UPDATE, game);
+      socket.to(currentRoomId).emit(SocketEvent.MOVE_UPDATE, game);
 
       // Notify the opponent who initiated the draw offer that it was declined
-      socket.to(currentRoomId).emit('drawOfferRejected');
+      socket.to(currentRoomId).emit(SocketEvent.DRAW_OFFER_REJECTED);
     },
 
     disconnect: async () => {

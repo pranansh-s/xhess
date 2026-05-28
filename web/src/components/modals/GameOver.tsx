@@ -2,25 +2,27 @@
 
 import { memo } from 'react';
 import { useRouter } from 'next/navigation';
+
+import SocketService from '@/services/socket.service';
 import tw from 'tailwind-styled-components';
 
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { opponentSide } from '@xhess/shared/utils';
+
 import { closeModal } from '@/redux/features/modalSlice';
-import SocketService from '@/services/socket.service';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+
 import Button from '../common/Button';
 import ModalContainer from './Modal';
-import { opponentSide } from '@xhess/shared/utils';
 
 const GameOver = memo(() => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  
+
   const { state: gameState, endReason, playerSide, gameType } = useAppSelector(state => state.gameState);
 
   const isDraw = gameState === 'draw';
-  const isWinner = 
-    (gameState === 'whiteWin' && playerSide === 'white') ||
-    (gameState === 'blackWin' && playerSide === 'black');
+  const isWinner =
+    (gameState === 'whiteWin' && playerSide === 'white') || (gameState === 'blackWin' && playerSide === 'black');
 
   const getTitleText = () => {
     if (isDraw) return 'DRAW';
@@ -58,7 +60,7 @@ const GameOver = memo(() => {
       <ResultTitle $isWinner={isWinner} $isDraw={isDraw}>
         {getTitleText()}
       </ResultTitle>
-      
+
       <ReasonSub>{getReasonText()}</ReasonSub>
 
       <ButtonWrapper>
@@ -97,20 +99,19 @@ const ResultTitle = tw.h2<{ $isWinner: boolean; $isDraw: boolean }>`
   ${p => {
     if (p.$isDraw) return 'text-amber-500';
     return p.$isWinner ? 'text-green-500 animate-pulse' : 'text-red-500';
-  }}
-`;
+  }} `;
 
 const ReasonSub = tw.p`
+  mb-4
+  font-sans
   text-lg
   text-secondary
   opacity-80
-  font-sans
-  mb-4
 `;
 
 const ButtonWrapper = tw.div`
   flex
-  flex-col
   w-full
+  flex-col
   gap-4
 `;

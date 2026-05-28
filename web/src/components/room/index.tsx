@@ -8,8 +8,8 @@ import useRoomInit from '@/hooks/useRoomInit';
 import { useAppSelector } from '@/redux/hooks';
 
 import GameBar from '../game-bar';
-import GameOver from '../modals/GameOver';
 import DrawOffer from '../modals/DrawOffer';
+import GameOver from '../modals/GameOver';
 import GameSettings from '../modals/GameSettings';
 import Surrender from '../modals/Surrender';
 import Waiting from '../modals/Waiting';

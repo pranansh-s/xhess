@@ -83,13 +83,7 @@ const gameSlice = createSlice({
   },
 });
 
-export const {
-  initGameState,
-  updateGameState,
-  whitePlayerUpdate,
-  setOpponentProfile,
-  blackPlayerUpdate,
-  endTurn,
-} = gameSlice.actions;
+export const { initGameState, updateGameState, whitePlayerUpdate, setOpponentProfile, blackPlayerUpdate, endTurn } =
+  gameSlice.actions;
 
 export default gameSlice.reducer;

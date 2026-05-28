@@ -3,7 +3,7 @@
 
 # XHESS
 
-### A Modern, Real-Time 3D Chess Platform & High-Scalability Monorepo
+### A Modern, Real-Time Chess Platform with Immersive 3D UI & High-Scalability Monorepo
 
 [![Next.js](https://img.shields.io/badge/Next.js-15.3.2-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org/)
 [![React Three Fiber](https://img.shields.io/badge/React_Three_Fiber-9.1.2-blueviolet?style=for-the-badge&logo=three.js)](https://github.com/pmndrs/react-three-fiber)
@@ -36,7 +36,7 @@ Rather than a simple Minimum Viable Product, Xhess is designed as a **Proof of C
 
 ## ⚡ Key Features
 
-- **🎮 Immersive 3D Chessboard:** Sleek, custom 3D chess pieces (King & Queen models) rendered smoothly in the browser using **React Three Fiber (R3F)**, **Drei**, and **Three.js**.
+- **🎮 Immersive 3D UI Visuals:** Sleek, custom 3D chess piece models rendered smoothly in the browser using **React Three Fiber (R3F)**, **Drei**, and **Three.js**. Rather than placing heavy 3D canvases on the active playfield, these assets are strategically deployed for a premium user experience—including an interactive 3D Side Selector in the game settings and a beautiful, animated floating 3D piece scene in the lobby background. The gameplay board is kept in a highly responsive and crisp 2D grid.
 - **🔌 Real-Time Gameplay:** Bidirectional, ultra-low-latency move and game state updates powered by **Socket.IO** rooms.
 - **⚡ Cache-Aside Storage Pipeline:** A highly performant database access pattern using a **Redis** cache in front of a reliable **Google Firestore (Firebase)** document store.
 - **🔗 Unified Monorepo:** Shared TypeScript types, Zod schemas, and utility functions package (`@xhess/shared`) for complete, compile-time end-to-end type safety between frontend and backend.
@@ -52,7 +52,7 @@ Xhess leverages modern system design patterns, separating core game logic, cachi
 
 ```mermaid
 graph TD
-    A[Next.js 3D Web App] <-->|Socket.IO Bidirectional| B(Express Backend API)
+    A[Next.js Web App with 3D UI] <-->|Socket.IO Bidirectional| B(Express Backend API)
     A -->|HTTPS REST API| B
     B -->|1. Cache Query| C{Redis Cache}
     C -->|Cache Hit| B
@@ -105,7 +105,7 @@ xhess/
 ├── web/                     # Frontend Next.js Client App (@xhess/web)
 │   ├── src/
 │   │   ├── app/             # Next.js App Router folders (pages, dynamic room routing)
-│   │   ├── components/      # Common 3D models, landing setups, custom 3D Board and Cells
+│   │   ├── components/      # Common 3D models, landing setups, custom 2D Board and Cells
 │   │   └── redux/           # Global store, slices, and custom hooks
 │   └── package.json
 ├── docker-compose.yml       # Full monorepo containerization configuration
@@ -142,31 +142,35 @@ BACKEND_URL=http://localhost:8000
 
 ### 2. Redis Setup for Local Run
 
-The backend server relies on Redis for high-performance caching. You must have a Redis instance running locally at `localhost:6379` before starting the native development servers. 
+The backend server relies on Redis for high-performance caching. You must have a Redis instance running locally at `localhost:6379` before starting the native development servers.
 
 Choose one of the following methods to spin up Redis:
 
 #### Option A: Run via Docker (Recommended & Simplest)
+
 If you have Docker installed, you can start a lightweight Redis container with a single command:
+
 ```bash
 docker run --name xhess-redis -p 6379:6379 -d redis:7-alpine
 ```
-*Tip: Use `docker stop xhess-redis` and `docker start xhess-redis` to stop and start the container as needed.*
+
+_Tip: Use `docker stop xhess-redis` and `docker start xhess-redis` to stop and start the container as needed._
 
 #### Option B: Run Natively on Your Host OS
-*   **macOS (Homebrew):**
-    ```bash
-    brew install redis
-    brew services start redis
-    ```
-*   **Linux (Ubuntu/Debian):**
-    ```bash
-    sudo apt update
-    sudo apt install redis-server
-    sudo systemctl start redis-server
-    ```
-*   **Windows:**
-    Run Redis via WSL2 by following the [Official Redis Setup Guide](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/).
+
+- **macOS (Homebrew):**
+  ```bash
+  brew install redis
+  brew services start redis
+  ```
+- **Linux (Ubuntu/Debian):**
+  ```bash
+  sudo apt update
+  sudo apt install redis-server
+  sudo systemctl start redis-server
+  ```
+- **Windows:**
+  Run Redis via WSL2 by following the [Official Redis Setup Guide](https://redis.io/docs/latest/operate/oss_and_stack/install/install-redis/install-redis-on-windows/).
 
 ---
 

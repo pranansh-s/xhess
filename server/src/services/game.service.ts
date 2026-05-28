@@ -48,7 +48,8 @@ const GameService = {
     const game = await GameService.getGame(gameId);
 
     const lastMove = game.moves[game.moves.length - 1];
-    const isDuplicate = lastMove &&
+    const isDuplicate =
+      lastMove &&
       lastMove.from.x === move.from.x &&
       lastMove.from.y === move.from.y &&
       lastMove.to.x === move.to.x &&
