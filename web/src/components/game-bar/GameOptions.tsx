@@ -2,6 +2,7 @@ import tw from 'tailwind-styled-components';
 
 import { openModal } from '@/redux/features/modalSlice';
 import { useAppDispatch } from '@/redux/hooks';
+import SocketService from '@/services/socket.service';
 
 import surrender from '@/../public/icons/flag.svg';
 import draw from '@/../public/icons/handshake.svg';
@@ -14,9 +15,13 @@ const GameOptions = () => {
     dispatch(openModal('surrender'));
   };
 
+  const handleOfferDraw = () => {
+    SocketService.offerDraw();
+  };
+
   return (
     <OptionsContainer>
-      <Button size="icon" preIconNode={draw} themeColor="green" />
+      <Button size="icon" preIconNode={draw} themeColor="green" onClick={handleOfferDraw} />
       <Button size="icon" preIconNode={surrender} onClick={handleSurrenderModal} />
     </OptionsContainer>
   );

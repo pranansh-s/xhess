@@ -7,7 +7,16 @@ import { ZodError } from 'zod';
 import { ForbiddenError, ServiceError, UnauthorizedError } from './utils/error.js';
 
 export const appCors = cors({
-  origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+  origin: (origin, callback) => {
+    const allowedOrigins = process.env.CORS_ORIGIN
+      ? process.env.CORS_ORIGIN.split(',')
+      : ['http://localhost:3000'];
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST'],
   credentials: true,
 });

@@ -12,6 +12,8 @@ export interface Game {
   moves: Move[];
   playerTurn: Color;
   state: GameState;
+  endReason?: 'checkmate' | 'resignation' | 'timeout' | 'stalemate' | 'drawAgreement';
+  drawOfferBy?: string;
 
   whiteSidePlayer: PlayerState | null;
   blackSidePlayer: PlayerState | null;

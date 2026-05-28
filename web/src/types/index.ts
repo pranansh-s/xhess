@@ -2,7 +2,7 @@ import { Group } from 'three';
 
 import { GameType } from '@xhess/shared/types';
 
-export type ModalType = 'gameSettings' | 'joinRoom' | 'waiting' | 'surrender' | null;
+export type ModalType = 'gameSettings' | 'joinRoom' | 'waiting' | 'surrender' | 'gameOver' | 'drawOffer' | null;
 
 export interface GameTypeOption {
   name: string;

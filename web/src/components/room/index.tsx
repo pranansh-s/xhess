@@ -8,6 +8,8 @@ import useRoomInit from '@/hooks/useRoomInit';
 import { useAppSelector } from '@/redux/hooks';
 
 import GameBar from '../game-bar';
+import GameOver from '../modals/GameOver';
+import DrawOffer from '../modals/DrawOffer';
 import GameSettings from '../modals/GameSettings';
 import Surrender from '../modals/Surrender';
 import Waiting from '../modals/Waiting';
@@ -27,6 +29,8 @@ const RoomClient: React.FC<IRoomProps> = ({ roomId, room }) => {
       {activeModal === 'gameSettings' && <GameSettings />}
       {activeModal === 'waiting' && <Waiting />}
       {activeModal === 'surrender' && <Surrender />}
+      {activeModal === 'gameOver' && <GameOver />}
+      {activeModal === 'drawOffer' && <DrawOffer />}
       <GameUI />
       <GameBar />
     </RoomContainer>

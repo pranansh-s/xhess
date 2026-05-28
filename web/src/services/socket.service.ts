@@ -16,8 +16,9 @@ import {
   setOpponentProfile,
   whitePlayerUpdate,
 } from '@/redux/features/gameSlice';
-import { closeModal } from '@/redux/features/modalSlice';
-import { AppDispatch } from '@/redux/store';
+import { closeModal, openModal } from '@/redux/features/modalSlice';
+import { AppDispatch, store } from '@/redux/store';
+import UserService from '@/services/user.service';
 
 const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL);
 
@@ -31,6 +32,7 @@ const SocketService = {
     socket.off('receiveChatMessage');
     socket.off('gameJoined');
     socket.off('moveUpdate');
+    socket.off('drawOfferRejected');
 
     socket.on('error', (message: string) => {
       showErrorToast('Failed to process task', message);
@@ -45,15 +47,32 @@ const SocketService = {
     });
 
     socket.on('moveUpdate', (game: Game) => {
-      const move = game.moves.at(-1);
-      if (!move) {
-        throw new Error('No move to update');
-      }
-
       dispatch(updateGameState(game));
       SocketService.updatePlayerState(dispatch, game);
-      dispatch(movePiece(move));
-      dispatch(endTurn());
+
+      const localMoves = store.getState().board.moves;
+      if (game.moves.length > localMoves.length) {
+        const lastMove = game.moves.at(-1);
+        if (lastMove) {
+          dispatch(movePiece(lastMove));
+          dispatch(endTurn());
+        }
+      }
+
+      if (game.state !== 'isPlaying' && game.state !== 'isWaiting') {
+        dispatch(openModal('gameOver'));
+      } else {
+        const localUserId = UserService.getUserId();
+        if (game.drawOfferBy && game.drawOfferBy !== localUserId) {
+          dispatch(openModal('drawOffer'));
+        } else if (!game.drawOfferBy && store.getState().modals === 'drawOffer') {
+          dispatch(closeModal());
+        }
+      }
+    });
+
+    socket.on('drawOfferRejected', () => {
+      showErrorToast('Draw Offer Declined', 'Your opponent has declined the draw offer.');
     });
 
     auth.currentUser?.getIdToken()
@@ -70,7 +89,17 @@ const SocketService = {
     dispatch(initMoves(game.moves));
     dispatch(initGameState(game));
     dispatch(setOpponentProfile(profile));
-    dispatch(closeModal());
+
+    if (game.state !== 'isPlaying' && game.state !== 'isWaiting') {
+      dispatch(openModal('gameOver'));
+    } else {
+      const localUserId = UserService.getUserId();
+      if (game.drawOfferBy && game.drawOfferBy !== localUserId) {
+        dispatch(openModal('drawOffer'));
+      } else {
+        dispatch(closeModal());
+      }
+    }
   },
 
   updatePlayerState: (dispatch: AppDispatch, game: Game) => {
@@ -84,6 +113,18 @@ const SocketService = {
 
   surrender: () => {
     socket.emit('surrender');
+  },
+
+  offerDraw: () => {
+    socket.emit('offerDraw');
+  },
+
+  acceptDraw: () => {
+    socket.emit('acceptDraw');
+  },
+
+  rejectDraw: () => {
+    socket.emit('rejectDraw');
   },
 
   sendMessage: (message: string) => {

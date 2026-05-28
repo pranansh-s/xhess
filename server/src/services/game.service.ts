@@ -71,6 +71,7 @@ const GameService = {
       if (remainingBeforeMove <= 0) {
         currentPlayerState.remainingTime = 0;
         game.state = game.playerTurn === 'white' ? 'blackWin' : 'whiteWin';
+        game.endReason = 'timeout';
         game.lastPlayedAt = now;
         await GameService.saveGame(game, gameId);
         return game;
@@ -169,6 +170,96 @@ const GameService = {
     await RoomService.saveRoom(roomId, room);
 
     return newGame;
+  },
+
+  surrenderGame: async (roomId: string, userId: string): Promise<Game> => {
+    const gameId = await GameService.getGameId(roomId);
+    const game = await GameService.getGame(gameId);
+
+    if (game.state !== 'isPlaying') {
+      throw new ServiceError('Game is not active');
+    }
+
+    if (game.whiteSidePlayer?.userId === userId) {
+      game.state = 'blackWin';
+      game.endReason = 'resignation';
+    } else if (game.blackSidePlayer?.userId === userId) {
+      game.state = 'whiteWin';
+      game.endReason = 'resignation';
+    } else {
+      throw new ServiceError('User is not a player in this game');
+    }
+
+    game.lastPlayedAt = Date.now();
+    await GameService.saveGame(game, gameId);
+    return game;
+  },
+
+  offerDrawGame: async (roomId: string, userId: string): Promise<Game> => {
+    const gameId = await GameService.getGameId(roomId);
+    const game = await GameService.getGame(gameId);
+
+    if (game.state !== 'isPlaying') {
+      throw new ServiceError('Game is not active');
+    }
+
+    if (game.whiteSidePlayer?.userId !== userId && game.blackSidePlayer?.userId !== userId) {
+      throw new ServiceError('User is not a player in this game');
+    }
+
+    game.drawOfferBy = userId;
+    await GameService.saveGame(game, gameId);
+    return game;
+  },
+
+  acceptDrawGame: async (roomId: string, userId: string): Promise<Game> => {
+    const gameId = await GameService.getGameId(roomId);
+    const game = await GameService.getGame(gameId);
+
+    if (game.state !== 'isPlaying') {
+      throw new ServiceError('Game is not active');
+    }
+
+    if (!game.drawOfferBy) {
+      throw new ServiceError('No active draw offer exists');
+    }
+
+    if (game.drawOfferBy === userId) {
+      throw new ServiceError('Cannot accept your own draw offer');
+    }
+
+    if (game.whiteSidePlayer?.userId !== userId && game.blackSidePlayer?.userId !== userId) {
+      throw new ServiceError('User is not a player in this game');
+    }
+
+    game.state = 'draw';
+    game.endReason = 'drawAgreement';
+    delete game.drawOfferBy;
+
+    game.lastPlayedAt = Date.now();
+    await GameService.saveGame(game, gameId);
+    return game;
+  },
+
+  rejectDrawGame: async (roomId: string, userId: string): Promise<Game> => {
+    const gameId = await GameService.getGameId(roomId);
+    const game = await GameService.getGame(gameId);
+
+    if (game.state !== 'isPlaying') {
+      throw new ServiceError('Game is not active');
+    }
+
+    if (!game.drawOfferBy) {
+      throw new ServiceError('No active draw offer exists');
+    }
+
+    if (game.whiteSidePlayer?.userId !== userId && game.blackSidePlayer?.userId !== userId) {
+      throw new ServiceError('User is not a player in this game');
+    }
+
+    delete game.drawOfferBy;
+    await GameService.saveGame(game, gameId);
+    return game;
   },
 };
 

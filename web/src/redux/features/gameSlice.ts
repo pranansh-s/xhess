@@ -8,6 +8,8 @@ const initialState = {
   isTurn: true,
   isPlaying: false,
   state: 'isWaiting' as GameState,
+  endReason: undefined as 'checkmate' | 'resignation' | 'timeout' | 'stalemate' | 'drawAgreement' | undefined,
+  drawOfferBy: undefined as string | undefined,
   playerSide: 'white' as Color,
   gameType: '30m' as GameType,
   players: {
@@ -22,7 +24,7 @@ const gameSlice = createSlice({
   initialState,
   reducers: {
     initGameState: (_, action: PayloadAction<Game>) => {
-      const { playerTurn, state, whiteSidePlayer, blackSidePlayer, gameType } = action.payload;
+      const { playerTurn, state, whiteSidePlayer, blackSidePlayer, gameType, endReason, drawOfferBy } = action.payload;
       const userId = UserService.getUserId();
       if (!userId) return;
 
@@ -39,6 +41,8 @@ const gameSlice = createSlice({
         gameType,
         isPlaying: state == 'isPlaying',
         state,
+        endReason,
+        drawOfferBy,
         players: {
           whiteSidePlayer,
           blackSidePlayer,
@@ -48,8 +52,10 @@ const gameSlice = createSlice({
     },
 
     updateGameState: (state, action: PayloadAction<Game>) => {
-      const { state: newState, whiteSidePlayer, blackSidePlayer } = action.payload;
+      const { state: newState, whiteSidePlayer, blackSidePlayer, endReason, drawOfferBy } = action.payload;
       state.state = newState;
+      state.endReason = endReason;
+      state.drawOfferBy = drawOfferBy;
       state.isPlaying = newState === 'isPlaying';
       if (whiteSidePlayer) {
         state.players.whiteSidePlayer = whiteSidePlayer;

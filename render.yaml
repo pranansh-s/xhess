@@ -20,11 +20,6 @@ services:
           property: connectionString
       - key: NODE_ENV
         value: production
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: xhess-redis
-          property: connectionString
       - key: FIREBASE_PROJECT_ID
         value: check-and-mate-26c90
       - key: FIREBASE_CLIENT_EMAIL

@@ -102,11 +102,44 @@ export const socketHandlers = (socket: Socket) => {
       socket.to(currentRoomId).emit('moveUpdate', game);
     },
 
-    // surrender: async () => {
-    //   if (!currentRoomId || !currentUserId) return;
+    surrender: async () => {
+      if (!currentRoomId || !currentUserId) return;
 
-    //   await GameService.
-    // },
+      const game = await GameService.surrenderGame(currentRoomId, currentUserId);
+
+      socket.emit('moveUpdate', game);
+      socket.to(currentRoomId).emit('moveUpdate', game);
+    },
+
+    offerDraw: async () => {
+      if (!currentRoomId || !currentUserId) return;
+
+      const game = await GameService.offerDrawGame(currentRoomId, currentUserId);
+
+      socket.emit('moveUpdate', game);
+      socket.to(currentRoomId).emit('moveUpdate', game);
+    },
+
+    acceptDraw: async () => {
+      if (!currentRoomId || !currentUserId) return;
+
+      const game = await GameService.acceptDrawGame(currentRoomId, currentUserId);
+
+      socket.emit('moveUpdate', game);
+      socket.to(currentRoomId).emit('moveUpdate', game);
+    },
+
+    rejectDraw: async () => {
+      if (!currentRoomId || !currentUserId) return;
+
+      const game = await GameService.rejectDrawGame(currentRoomId, currentUserId);
+
+      socket.emit('moveUpdate', game);
+      socket.to(currentRoomId).emit('moveUpdate', game);
+
+      // Notify the opponent who initiated the draw offer that it was declined
+      socket.to(currentRoomId).emit('drawOfferRejected');
+    },
 
     disconnect: async () => {
       if (!currentRoomId || !currentUserId) return;

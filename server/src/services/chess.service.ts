@@ -35,8 +35,10 @@ class ChessService {
     if (this.isStalemate(game.playerTurn)) {
       if (this.isCheckMate(game.playerTurn)) {
         game.state = game.playerTurn == 'white' ? 'blackWin' : 'whiteWin';
+        game.endReason = 'checkmate';
       } else {
         game.state = 'draw';
+        game.endReason = 'stalemate';
       }
     }
   };
