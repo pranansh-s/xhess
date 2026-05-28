@@ -2,6 +2,7 @@ import admin from 'firebase-admin';
 import { Socket } from 'socket.io';
 import { ZodError } from 'zod';
 
+import { GameConfigSchema, MessageSchema, MoveSchema, RoomKeySchema } from '@xhess/shared/schemas';
 import { GameConfig, Move, SocketEvent } from '@xhess/shared/types';
 
 import GameService from '../services/game.service.js';
@@ -48,6 +49,8 @@ export const socketHandlers = (socket: Socket) => {
 
   return {
     joinRoom: async (roomId: string, userId: string, token?: string) => {
+      const parsedRoomId = RoomKeySchema.parse(roomId);
+      
       if (!token) {
         throw new ServiceError('Unauthorized: Identity verification required');
       }
@@ -61,15 +64,15 @@ export const socketHandlers = (socket: Socket) => {
         throw new ServiceError('Unauthorized: Invalid or expired access credentials');
       }
 
-      if (currentRoomId && currentRoomId !== roomId) {
+      if (currentRoomId && currentRoomId !== parsedRoomId) {
         await RoomService.leaveRoom(currentRoomId, userId);
         socket.leave(currentRoomId);
       }
 
-      await RoomService.joinRoom(roomId, userId).catch(() => null);
+      await RoomService.joinRoom(parsedRoomId, userId).catch(() => null);
 
-      socket.join(roomId);
-      currentRoomId = roomId;
+      socket.join(parsedRoomId);
+      currentRoomId = parsedRoomId;
       currentUserId = userId;
 
       const game = await GameService.joinGame(roomId, userId).catch(err =>
@@ -85,20 +88,22 @@ export const socketHandlers = (socket: Socket) => {
     },
 
     sendChatMessage: async (content: string) => {
+      const parsedContent = MessageSchema.parse(content);
       await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
-      const message = await RoomService.sendMessage(currentRoomId, currentUserId, content);
+      const message = await RoomService.sendMessage(currentRoomId, currentUserId, parsedContent);
 
       socket.emit(SocketEvent.RECEIVE_CHAT_MESSAGE, message);
       socket.to(currentRoomId).emit(SocketEvent.RECEIVE_CHAT_MESSAGE, message);
     },
 
     newGame: async (config: GameConfig) => {
+      const parsedConfig = GameConfigSchema.parse(config);
       await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
-      const newGame = await GameService.createGame(config, currentRoomId, currentUserId);
+      const newGame = await GameService.createGame(parsedConfig, currentRoomId, currentUserId);
       const { myProfile, opponentProfile } = await ProfileService.getPlayerProfiles(currentRoomId, currentUserId);
 
       socket.emit(SocketEvent.GAME_JOINED, newGame, opponentProfile);
@@ -106,10 +111,11 @@ export const socketHandlers = (socket: Socket) => {
     },
 
     newMove: async (move: Move) => {
+      const parsedMove = MoveSchema.parse(move);
       await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
-      const game = await GameService.addMove(currentRoomId, move);
+      const game = await GameService.addMove(currentRoomId, parsedMove);
 
       socket.emit(SocketEvent.MOVE_UPDATE, game);
       socket.to(currentRoomId).emit(SocketEvent.MOVE_UPDATE, game);

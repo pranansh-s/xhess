@@ -23,7 +23,6 @@ export default function AuthLayout({
         themeColor="google"
         type="button"
         isLoading={false}
-        // onClick={handleGoogleSignIn}
       >
         continue with google
       </Button>

@@ -12,8 +12,6 @@ import ChessService from './chess.service.js';
 import roomServiceInstance from './room.service.js';
 
 const GAME_PREFIX = 'games';
-const roomToGameId = new Map<string, string>();
-const chessCache = new Map<string, ChessService>();
 
 export class GameService {
   constructor(
@@ -22,18 +20,11 @@ export class GameService {
   ) {}
 
   getGameId = async (roomId: string): Promise<string> => {
-    let gameId = roomToGameId.get(roomId);
-    if (!gameId) {
-      const room = await this.roomService.getRoom(roomId);
-      if (room && room.gameId) {
-        gameId = room.gameId;
-        roomToGameId.set(roomId, gameId);
-      }
-    }
-    if (!gameId) {
+    const room = await this.roomService.getRoom(roomId);
+    if (!room || !room.gameId) {
       throw new ServiceError('No game in room');
     }
-    return gameId;
+    return room.gameId;
   };
 
   getGame = async (id: string): Promise<Game> => {
@@ -84,8 +75,7 @@ export class GameService {
       }
     }
 
-    const chess = chessCache.get(gameId) || new ChessService(game);
-    chessCache.set(gameId, chess);
+    const chess = new ChessService(game);
 
     chess.makeMove(move);
     chess.validateEndGame(game);
@@ -173,7 +163,6 @@ export class GameService {
     };
 
     const uuid = randomUUID();
-    roomToGameId.set(roomId, uuid);
 
     await this.saveGame(newGame, uuid);
 

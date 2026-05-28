@@ -7,7 +7,6 @@ import { ServiceError } from '../utils/error.js';
 import { generateRoomKey } from '../utils/room.js';
 
 const ROOM_PREFIX = 'rooms';
-const activeRoomIds: Set<string> = new Set();
 
 export class RoomService {
   constructor(private dbController: typeof dbControllerInstance) {}
@@ -26,14 +25,13 @@ export class RoomService {
 
   destroyRoom = async (roomId: string) => {
     await this.dbController.deleteData(ROOM_PREFIX, roomId);
-    activeRoomIds.delete(roomId);
   };
 
   createRoom = async (userId: string): Promise<string> => {
-    let roomId = generateRoomKey(activeRoomIds);
+    let roomId = generateRoomKey();
     let existingRoom = await this.dbController.loadData<Room>(ROOM_PREFIX, roomId).catch(() => null);
     while (existingRoom) {
-      roomId = generateRoomKey(activeRoomIds);
+      roomId = generateRoomKey();
       existingRoom = await this.dbController.loadData<Room>(ROOM_PREFIX, roomId).catch(() => null);
     }
 
@@ -44,7 +42,6 @@ export class RoomService {
     };
 
     await this.saveRoom(roomId, createdRoom);
-    activeRoomIds.add(roomId);
 
     return roomId;
   };

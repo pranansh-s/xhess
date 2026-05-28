@@ -8,7 +8,6 @@ export const useForm = () => {
   const [formState, setFormState] = useState<{ [key: string]: IInputValue }>({});
   const hasErrors = Object.values(formState).some(input => input?.error);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleInputChange = (schema: any) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     try {
