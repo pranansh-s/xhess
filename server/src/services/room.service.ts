@@ -1,7 +1,7 @@
 import { MessageSchema } from '@xhess/shared/schemas';
 import { ChatMessage, Room } from '@xhess/shared/types';
 
-import dbController from '../controllers/db.controller.js';
+import dbControllerInstance from '../controllers/db.controller.js';
 
 import { ServiceError } from '../utils/error.js';
 import { generateRoomKey } from '../utils/room.js';
@@ -9,30 +9,32 @@ import { generateRoomKey } from '../utils/room.js';
 const ROOM_PREFIX = 'rooms';
 const activeRoomIds: Set<string> = new Set();
 
-const RoomService = {
-  getRoom: async (roomId: string): Promise<Room> => {
-    const room = await dbController.loadData<Room>(ROOM_PREFIX, roomId);
+export class RoomService {
+  constructor(private dbController: typeof dbControllerInstance) {}
+
+  getRoom = async (roomId: string): Promise<Room> => {
+    const room = await this.dbController.loadData<Room>(ROOM_PREFIX, roomId);
     if (!room) {
       throw new ServiceError('Room not found');
     }
     return room;
-  },
+  };
 
-  saveRoom: (roomId: string, room: Room) => {
-    return dbController.saveData<Room>(ROOM_PREFIX, room, roomId);
-  },
+  saveRoom = (roomId: string, room: Room) => {
+    return this.dbController.saveData<Room>(ROOM_PREFIX, room, roomId);
+  };
 
-  destroyRoom: async (roomId: string) => {
-    await dbController.deleteData(ROOM_PREFIX, roomId);
+  destroyRoom = async (roomId: string) => {
+    await this.dbController.deleteData(ROOM_PREFIX, roomId);
     activeRoomIds.delete(roomId);
-  },
+  };
 
-  createRoom: async (userId: string): Promise<string> => {
+  createRoom = async (userId: string): Promise<string> => {
     let roomId = generateRoomKey(activeRoomIds);
-    let existingRoom = await dbController.loadData<Room>(ROOM_PREFIX, roomId).catch(() => null);
+    let existingRoom = await this.dbController.loadData<Room>(ROOM_PREFIX, roomId).catch(() => null);
     while (existingRoom) {
       roomId = generateRoomKey(activeRoomIds);
-      existingRoom = await dbController.loadData<Room>(ROOM_PREFIX, roomId).catch(() => null);
+      existingRoom = await this.dbController.loadData<Room>(ROOM_PREFIX, roomId).catch(() => null);
     }
 
     const createdRoom: Room = {
@@ -41,14 +43,14 @@ const RoomService = {
       chat: [],
     };
 
-    await RoomService.saveRoom(roomId, createdRoom);
+    await this.saveRoom(roomId, createdRoom);
     activeRoomIds.add(roomId);
 
     return roomId;
-  },
+  };
 
-  joinRoom: async (roomId: string, userId: string): Promise<Room> => {
-    const room = await RoomService.getRoom(roomId);
+  joinRoom = async (roomId: string, userId: string): Promise<Room> => {
+    const room = await this.getRoom(roomId);
 
     if (room.participants.includes(userId)) {
       return room;
@@ -58,12 +60,12 @@ const RoomService = {
     }
     room.participants.push(userId);
 
-    await RoomService.saveRoom(roomId, room);
+    await this.saveRoom(roomId, room);
     return room;
-  },
+  };
 
-  leaveRoom: async (roomId: string, userId: string) => {
-    const room = await RoomService.getRoom(roomId);
+  leaveRoom = async (roomId: string, userId: string) => {
+    const room = await this.getRoom(roomId);
 
     if (!room.participants.includes(userId)) {
       return room;
@@ -71,15 +73,15 @@ const RoomService = {
 
     room.participants = room.participants.filter(id => id !== userId);
     if (room.participants.length == 0) {
-      await RoomService.destroyRoom(roomId);
+      await this.destroyRoom(roomId);
       return room;
     }
 
-    await RoomService.saveRoom(roomId, room);
-  },
+    await this.saveRoom(roomId, room);
+  };
 
-  sendMessage: async (roomId: string, userId: string, content: string): Promise<ChatMessage> => {
-    const room = await RoomService.getRoom(roomId);
+  sendMessage = async (roomId: string, userId: string, content: string): Promise<ChatMessage> => {
+    const room = await this.getRoom(roomId);
 
     MessageSchema.parse(content);
     const createdMessage: ChatMessage = {
@@ -97,9 +99,10 @@ const RoomService = {
       chat: [...(room.chat || []), createdMessage],
     };
 
-    await RoomService.saveRoom(roomId, updatedRoom);
+    await this.saveRoom(roomId, updatedRoom);
     return createdMessage;
-  },
-};
+  };
+}
 
-export default RoomService;
+const roomService = new RoomService(dbControllerInstance);
+export default roomService;

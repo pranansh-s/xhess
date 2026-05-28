@@ -3,23 +3,28 @@ import { randomUUID } from 'node:crypto';
 import { Game, GameConfig, Move, PlayerState } from '@xhess/shared/types';
 import { opponentSide } from '@xhess/shared/utils';
 
-import dbController from '../controllers/db.controller.js';
+import dbControllerInstance from '../controllers/db.controller.js';
 
 import { ServiceError } from '../utils/error.js';
 import { GAME_TIME_MS, updateTimeLeft } from '../utils/game.js';
 
 import ChessService from './chess.service.js';
-import RoomService from './room.service.js';
+import roomServiceInstance from './room.service.js';
 
 const GAME_PREFIX = 'games';
 const roomToGameId = new Map<string, string>();
 const chessCache = new Map<string, ChessService>();
 
-const GameService = {
-  getGameId: async (roomId: string): Promise<string> => {
+export class GameService {
+  constructor(
+    private dbController: typeof dbControllerInstance,
+    private roomService: typeof roomServiceInstance
+  ) {}
+
+  getGameId = async (roomId: string): Promise<string> => {
     let gameId = roomToGameId.get(roomId);
     if (!gameId) {
-      const room = await RoomService.getRoom(roomId);
+      const room = await this.roomService.getRoom(roomId);
       if (room && room.gameId) {
         gameId = room.gameId;
         roomToGameId.set(roomId, gameId);
@@ -29,23 +34,23 @@ const GameService = {
       throw new ServiceError('No game in room');
     }
     return gameId;
-  },
+  };
 
-  getGame: async (id: string): Promise<Game> => {
-    const game = await dbController.loadData<Game>(GAME_PREFIX, id);
+  getGame = async (id: string): Promise<Game> => {
+    const game = await this.dbController.loadData<Game>(GAME_PREFIX, id);
     if (!game) {
       throw new ServiceError('Game not found');
     }
     return game;
-  },
+  };
 
-  saveGame: (game: Game, id: string) => {
-    return dbController.saveData<Game>(GAME_PREFIX, game, id);
-  },
+  saveGame = (game: Game, id: string) => {
+    return this.dbController.saveData<Game>(GAME_PREFIX, game, id);
+  };
 
-  addMove: async (roomId: string, move: Move): Promise<Game> => {
-    const gameId = await GameService.getGameId(roomId);
-    const game = await GameService.getGame(gameId);
+  addMove = async (roomId: string, move: Move): Promise<Game> => {
+    const gameId = await this.getGameId(roomId);
+    const game = await this.getGame(gameId);
 
     const lastMove = game.moves[game.moves.length - 1];
     const isDuplicate =
@@ -74,7 +79,7 @@ const GameService = {
         game.state = game.playerTurn === 'white' ? 'blackWin' : 'whiteWin';
         game.endReason = 'timeout';
         game.lastPlayedAt = now;
-        await GameService.saveGame(game, gameId);
+        await this.saveGame(game, gameId);
         return game;
       }
     }
@@ -90,21 +95,26 @@ const GameService = {
     game.moves.push(move);
     game.playerTurn = opponentSide(game.playerTurn);
 
-    await GameService.saveGame(game, gameId);
+    await this.saveGame(game, gameId);
     return game;
-  },
+  };
 
-  updateRemainingTime: async (roomId: string) => {
-    const gameId = await GameService.getGameId(roomId);
-    const game = await GameService.getGame(gameId);
+  updateRemainingTime = async (roomId: string) => {
+    const gameId = await this.getGameId(roomId);
+    const game = await this.getGame(gameId);
 
     updateTimeLeft(game, false);
-    await GameService.saveGame(game, gameId);
-  },
+    await this.saveGame(game, gameId);
+  };
 
-  joinGame: async (roomId: string, userId: string): Promise<Game> => {
-    const gameId = await GameService.getGameId(roomId);
-    const game = await GameService.getGame(gameId);
+  joinGame = async (roomId: string, userId: string): Promise<Game> => {
+    const room = await this.roomService.getRoom(roomId);
+    if (!room.participants.includes(userId)) {
+      throw new ServiceError('User is not a participant in this room');
+    }
+
+    const gameId = await this.getGameId(roomId);
+    const game = await this.getGame(gameId);
 
     if (game.whiteSidePlayer?.userId === userId || game.blackSidePlayer?.userId === userId) {
       return game;
@@ -127,11 +137,11 @@ const GameService = {
 
     game.lastPlayedAt = Date.now();
 
-    await GameService.saveGame(game, gameId);
+    await this.saveGame(game, gameId);
     return game;
-  },
+  };
 
-  createGame: async (config: GameConfig, roomId: string, userId: string): Promise<Game> => {
+  createGame = async (config: GameConfig, roomId: string, userId: string): Promise<Game> => {
     const { playerSide, gameType } = config;
 
     const playerState: PlayerState = {
@@ -139,7 +149,8 @@ const GameService = {
       remainingTime: GAME_TIME_MS[gameType].baseTime,
     };
 
-    const opponentUserId = (await RoomService.getRoom(roomId)).participants.find(id => id !== userId);
+    const room = await this.roomService.getRoom(roomId);
+    const opponentUserId = room.participants.find(id => id !== userId);
 
     const opponentPlayerState: PlayerState | null = opponentUserId
       ? {
@@ -164,18 +175,17 @@ const GameService = {
     const uuid = randomUUID();
     roomToGameId.set(roomId, uuid);
 
-    await GameService.saveGame(newGame, uuid);
+    await this.saveGame(newGame, uuid);
 
-    const room = await RoomService.getRoom(roomId);
     room.gameId = uuid;
-    await RoomService.saveRoom(roomId, room);
+    await this.roomService.saveRoom(roomId, room);
 
     return newGame;
-  },
+  };
 
-  surrenderGame: async (roomId: string, userId: string): Promise<Game> => {
-    const gameId = await GameService.getGameId(roomId);
-    const game = await GameService.getGame(gameId);
+  surrenderGame = async (roomId: string, userId: string): Promise<Game> => {
+    const gameId = await this.getGameId(roomId);
+    const game = await this.getGame(gameId);
 
     if (game.state !== 'isPlaying') {
       throw new ServiceError('Game is not active');
@@ -192,13 +202,13 @@ const GameService = {
     }
 
     game.lastPlayedAt = Date.now();
-    await GameService.saveGame(game, gameId);
+    await this.saveGame(game, gameId);
     return game;
-  },
+  };
 
-  offerDrawGame: async (roomId: string, userId: string): Promise<Game> => {
-    const gameId = await GameService.getGameId(roomId);
-    const game = await GameService.getGame(gameId);
+  offerDrawGame = async (roomId: string, userId: string): Promise<Game> => {
+    const gameId = await this.getGameId(roomId);
+    const game = await this.getGame(gameId);
 
     if (game.state !== 'isPlaying') {
       throw new ServiceError('Game is not active');
@@ -209,13 +219,13 @@ const GameService = {
     }
 
     game.drawOfferBy = userId;
-    await GameService.saveGame(game, gameId);
+    await this.saveGame(game, gameId);
     return game;
-  },
+  };
 
-  acceptDrawGame: async (roomId: string, userId: string): Promise<Game> => {
-    const gameId = await GameService.getGameId(roomId);
-    const game = await GameService.getGame(gameId);
+  acceptDrawGame = async (roomId: string, userId: string): Promise<Game> => {
+    const gameId = await this.getGameId(roomId);
+    const game = await this.getGame(gameId);
 
     if (game.state !== 'isPlaying') {
       throw new ServiceError('Game is not active');
@@ -238,13 +248,13 @@ const GameService = {
     delete game.drawOfferBy;
 
     game.lastPlayedAt = Date.now();
-    await GameService.saveGame(game, gameId);
+    await this.saveGame(game, gameId);
     return game;
-  },
+  };
 
-  rejectDrawGame: async (roomId: string, userId: string): Promise<Game> => {
-    const gameId = await GameService.getGameId(roomId);
-    const game = await GameService.getGame(gameId);
+  rejectDrawGame = async (roomId: string, userId: string): Promise<Game> => {
+    const gameId = await this.getGameId(roomId);
+    const game = await this.getGame(gameId);
 
     if (game.state !== 'isPlaying') {
       throw new ServiceError('Game is not active');
@@ -259,9 +269,10 @@ const GameService = {
     }
 
     delete game.drawOfferBy;
-    await GameService.saveGame(game, gameId);
+    await this.saveGame(game, gameId);
     return game;
-  },
-};
+  };
+}
 
-export default GameService;
+const gameService = new GameService(dbControllerInstance, roomServiceInstance);
+export default gameService;

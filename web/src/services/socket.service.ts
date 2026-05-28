@@ -75,12 +75,19 @@ const SocketService = {
       showErrorToast('Draw Offer Declined', 'Your opponent has declined the draw offer.');
     });
 
-    auth.currentUser
-      ?.getIdToken()
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      showErrorToast('Authentication failed', 'No active user session found. Please log in again.');
+      return;
+    }
+
+    currentUser
+      .getIdToken()
       .then(token => {
         socket.emit(SocketEvent.JOIN_ROOM, roomId, userId, token);
       })
-      .catch(() => {
+      .catch(err => {
+        console.error('Failed to retrieve authentication token:', err);
         showErrorToast('Failed to process task', 'Authentication failed');
       });
   },

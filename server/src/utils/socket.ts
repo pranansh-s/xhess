@@ -22,10 +22,10 @@ export const handleErrors = (handler: (...args: any[]) => Promise<void>, socket:
         console.error('[SOCKET_ERROR]', title, err.message);
         socket.emit(SocketEvent.ERROR, err.message);
       } else if (err instanceof DatabaseError) {
-        console.error('[SOCKET_ERROR]', title, err.message);
+        console.error('[SOCKET_ERROR_DATABASE]', title, err.message);
         socket.emit(SocketEvent.ERROR, 'Internal Server Error');
       } else {
-        console.error('[SOCKET_ERROR]', title, err);
+        console.error('[SOCKET_ERROR_UNEXPECTED]', title, err instanceof Error ? err.stack : err);
         socket.emit(SocketEvent.ERROR, 'Internal Server Error');
       }
     }
@@ -35,6 +35,16 @@ export const handleErrors = (handler: (...args: any[]) => Promise<void>, socket:
 export const socketHandlers = (socket: Socket) => {
   let currentRoomId: string | null = null;
   let currentUserId: string | null = null;
+
+  const assertActiveConnection = async () => {
+    if (!currentRoomId || !currentUserId) {
+      throw new ServiceError('Unauthorized: Active room session required');
+    }
+    const room = await RoomService.getRoom(currentRoomId);
+    if (!room.participants.includes(currentUserId)) {
+      throw new ServiceError('Unauthorized: User is not an active participant in this room');
+    }
+  };
 
   return {
     joinRoom: async (roomId: string, userId: string, token?: string) => {
@@ -75,6 +85,7 @@ export const socketHandlers = (socket: Socket) => {
     },
 
     sendChatMessage: async (content: string) => {
+      await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
       const message = await RoomService.sendMessage(currentRoomId, currentUserId, content);
@@ -84,6 +95,7 @@ export const socketHandlers = (socket: Socket) => {
     },
 
     newGame: async (config: GameConfig) => {
+      await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
       const newGame = await GameService.createGame(config, currentRoomId, currentUserId);
@@ -94,6 +106,7 @@ export const socketHandlers = (socket: Socket) => {
     },
 
     newMove: async (move: Move) => {
+      await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
       const game = await GameService.addMove(currentRoomId, move);
@@ -103,6 +116,7 @@ export const socketHandlers = (socket: Socket) => {
     },
 
     surrender: async () => {
+      await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
       const game = await GameService.surrenderGame(currentRoomId, currentUserId);
@@ -112,6 +126,7 @@ export const socketHandlers = (socket: Socket) => {
     },
 
     offerDraw: async () => {
+      await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
       const game = await GameService.offerDrawGame(currentRoomId, currentUserId);
@@ -121,6 +136,7 @@ export const socketHandlers = (socket: Socket) => {
     },
 
     acceptDraw: async () => {
+      await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
       const game = await GameService.acceptDrawGame(currentRoomId, currentUserId);
@@ -130,6 +146,7 @@ export const socketHandlers = (socket: Socket) => {
     },
 
     rejectDraw: async () => {
+      await assertActiveConnection();
       if (!currentRoomId || !currentUserId) return;
 
       const game = await GameService.rejectDrawGame(currentRoomId, currentUserId);

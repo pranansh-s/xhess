@@ -1,5 +1,4 @@
-//TODO: - DI in services, decrease procedural code, validation separately, better abstraction?, better error handling?, event enums rather than strings
-//init roomToGameId, currentRoomId, etc on server restart, login bug, O-O O-O-O, 50 move, 3-peat, en-passant
+//TODO: - DI in services, decrease procedural code, validation separately, better abstraction?, better error handling?
 
 import { Board, Color, Game, Move, Piece, Position } from '@xhess/shared/types';
 import { boardAfterMove, createBoard, getValidMovesForPiece, isKingInCheck } from '@xhess/shared/utils';
