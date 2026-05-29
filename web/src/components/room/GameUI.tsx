@@ -2,10 +2,10 @@ import { useMemo } from 'react';
 
 import tw from 'tailwind-styled-components';
 
-import { useAppSelector } from '@/redux/hooks';
+import Board from '@/components/room/Board';
+import UserBar from '@/components/room/user-bar';
 
-import Board from './Board';
-import UserBar from './user-bar';
+import { useAppSelector } from '@/redux/hooks';
 
 const GameUI = () => {
   const { playerSide, players } = useAppSelector(state => state.gameState);

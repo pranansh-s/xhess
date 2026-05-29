@@ -4,9 +4,9 @@ import { useState } from 'react';
 
 import tw from 'tailwind-styled-components';
 
-import Chat from './chat';
-import GameOptions from './GameOptions';
-import MoveHistory from './MoveHistory';
+import Chat from '@/components/game-bar/chat';
+import GameOptions from '@/components/game-bar/GameOptions';
+import MoveHistory from '@/components/game-bar/MoveHistory';
 
 const GameBar = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);

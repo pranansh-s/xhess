@@ -10,10 +10,10 @@ import { Group, MathUtils } from 'three';
 
 import { Color, GameConfig, GameType } from '@xhess/shared/types';
 
-import Button from '../common/Button';
-import ChessModel, { IChessModelProps } from '../common/ChessModel';
-import Lighting from '../common/Lighting';
-import ModalContainer from './Modal';
+import Button from '@/components/common/Button';
+import ChessModel, { IChessModelProps } from '@/components/common/ChessModel';
+import Lighting from '@/components/common/Lighting';
+import ModalContainer from '@/components/modals/Modal';
 
 interface IAnimatedChessModelProps extends Omit<IChessModelProps, 'modelPath'> {
   animate: boolean;
@@ -84,7 +84,7 @@ const GameSettings = memo(() => {
           <Canvas>
             <Lighting />
             <AnimatedChessModel
-              color="#505050"
+              color="#121212"
               rotation={[0, 0, 0.8]}
               targetRotation={-0.8}
               animate={hoveredSide == 'black' || selectedSide == 'black'}
@@ -101,7 +101,7 @@ const GameSettings = memo(() => {
           <Canvas>
             <Lighting />
             <AnimatedChessModel
-              color="#121212"
+              color="#e7e2d9"
               rotation={[0, 0, -0.8]}
               targetRotation={0.8}
               animate={hoveredSide == 'white' || selectedSide == 'white'}
@@ -118,7 +118,7 @@ const GameSettings = memo(() => {
           <Canvas>
             <Lighting />
             <AnimatedChessModel
-              color="#505050"
+              color="#e7e2d9"
               position={[-0.25, -0.25, -0.25]}
               rotation={[0, 0, -0.8]}
               targetRotation={0.8}

@@ -1,4 +1,4 @@
-import { Board, Color, Move, Piece, Position, PieceType } from '../../types/chess.js';
+import { Board, Color, Move, Piece, PieceType, Position } from '../../types/chess.js';
 
 export interface PieceMovementStrategy {
   getValidMoves(board: Board, piece: Piece, player: Color, moves: Move[]): Position[];

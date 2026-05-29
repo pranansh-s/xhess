@@ -1,10 +1,10 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import boardReducer from './features/boardSlice';
-import chatReducer from './features/chatSlice';
-import gameReducer from './features/gameSlice';
-import modalReducer from './features/modalSlice';
-import userReducer from './features/userSlice';
+import boardReducer from '@/redux/features/boardSlice';
+import chatReducer from '@/redux/features/chatSlice';
+import gameReducer from '@/redux/features/gameSlice';
+import modalReducer from '@/redux/features/modalSlice';
+import userReducer from '@/redux/features/userSlice';
 
 export const store = configureStore({
   reducer: {

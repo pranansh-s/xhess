@@ -5,9 +5,9 @@ import { useEffect, useRef } from 'react';
 import UserService from '@/services/user.service';
 import tw from 'tailwind-styled-components';
 
-import { useAppSelector } from '@/redux/hooks';
+import MessageItem from '@/components/game-bar/chat/MessageItem';
 
-import MessageItem from './MessageItem';
+import { useAppSelector } from '@/redux/hooks';
 
 const MessageList = () => {
   const userId = UserService.getUserId();

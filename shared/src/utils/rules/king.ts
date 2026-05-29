@@ -15,12 +15,11 @@ export const KingStrategy: PieceMovementStrategy = {
 
     const { x, y } = piece.pos;
     const kingStartRow = player === 'white' ? 7 : 0;
-    
+
     if (y === kingStartRow && x === 4) {
       const hasKingMoved = moves.some(m => m.from.x === 4 && m.from.y === kingStartRow);
-      
-      if (!hasKingMoved && !isKingInCheck(board, player)) {
 
+      if (!hasKingMoved && !isKingInCheck(board, player)) {
         const kingRook = board[kingStartRow][7];
         if (kingRook && kingRook.type === 'rook' && kingRook.color === player) {
           const hasKingRookMoved = moves.some(m => m.from.x === 7 && m.from.y === kingStartRow);
@@ -34,7 +33,6 @@ export const KingStrategy: PieceMovementStrategy = {
             validMoves.push({ x: 6, y: kingStartRow });
           }
         }
-
 
         const queenRook = board[kingStartRow][0];
         if (queenRook && queenRook.type === 'rook' && queenRook.color === player) {

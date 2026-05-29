@@ -2,7 +2,7 @@ import tw from 'tailwind-styled-components';
 
 import Button from '@/components/common/Button';
 
-import googleIcon from '../../../public/icons/google.svg';
+import googleIcon from '@/../public/icons/google.svg';
 
 export default function AuthLayout({
   children,
@@ -18,12 +18,7 @@ export default function AuthLayout({
         <DividerDashes />
       </Divider>
 
-      <Button
-        preIconNode={googleIcon}
-        themeColor="google"
-        type="button"
-        isLoading={false}
-      >
+      <Button preIconNode={googleIcon} themeColor="google" type="button" isLoading={false}>
         continue with google
       </Button>
     </Form>

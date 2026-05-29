@@ -50,7 +50,7 @@ export const socketHandlers = (socket: Socket) => {
   return {
     joinRoom: async (roomId: string, userId: string, token?: string) => {
       const parsedRoomId = RoomKeySchema.parse(roomId);
-      
+
       if (!token) {
         throw new ServiceError('Unauthorized: Identity verification required');
       }
@@ -75,7 +75,7 @@ export const socketHandlers = (socket: Socket) => {
       currentRoomId = parsedRoomId;
       currentUserId = userId;
 
-      const game = await GameService.joinGame(roomId, userId).catch(err =>
+      const game = await GameService.joinGame(parsedRoomId, userId).catch(err =>
         err instanceof ServiceError ? null : Promise.reject(err)
       );
 

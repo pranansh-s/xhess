@@ -7,11 +7,11 @@ import tw from 'tailwind-styled-components';
 
 import { Piece } from '@xhess/shared/types';
 
+import Cell from '@/components/room/Cell';
+
 import usePlayerInput from '@/hooks/usePlayerInput';
 import useValidMoves from '@/hooks/useValidMoves';
 import { useAppSelector } from '@/redux/hooks';
-
-import Cell from './Cell';
 
 interface IActivePiece {
   pos: {

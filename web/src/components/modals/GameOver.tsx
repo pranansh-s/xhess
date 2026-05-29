@@ -8,11 +8,11 @@ import tw from 'tailwind-styled-components';
 
 import { opponentSide } from '@xhess/shared/utils';
 
+import Button from '@/components/common/Button';
+import ModalContainer from '@/components/modals/Modal';
+
 import { closeModal } from '@/redux/features/modalSlice';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
-
-import Button from '../common/Button';
-import ModalContainer from './Modal';
 
 const GameOver = memo(() => {
   const router = useRouter();
@@ -26,7 +26,7 @@ const GameOver = memo(() => {
 
   const getTitleText = () => {
     if (isDraw) return 'DRAW';
-    return isWinner ? 'VICTORY' : 'DEFEAT';
+    return isWinner ? 'VICTORY!!!' : 'DEFEAT :(';
   };
 
   const getReasonText = () => {
@@ -56,7 +56,7 @@ const GameOver = memo(() => {
   };
 
   return (
-    <StyledModalContainer>
+    <ModalContainer className="max-w-[368px]">
       <ResultTitle $isWinner={isWinner} $isDraw={isDraw}>
         {getTitleText()}
       </ResultTitle>
@@ -71,25 +71,12 @@ const GameOver = memo(() => {
           Go to Lobby
         </Button>
       </ButtonWrapper>
-    </StyledModalContainer>
+    </ModalContainer>
   );
 });
 
 GameOver.displayName = 'GameOver';
 export default GameOver;
-
-const StyledModalContainer = tw(ModalContainer)`
-  flex
-  max-w-[400px]
-  flex-col
-  items-center
-  gap-6
-  border-none
-  bg-zinc-900
-  p-8
-  py-12
-  text-center
-`;
 
 const ResultTitle = tw.h2<{ $isWinner: boolean; $isDraw: boolean }>`
   font-serif

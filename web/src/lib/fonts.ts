@@ -1,8 +1,8 @@
-import { Limelight, Merriweather_Sans } from 'next/font/google';
+import { Fredericka_the_Great, Merriweather_Sans } from 'next/font/google';
 
-export const limelight = Limelight({
+export const frederickatheGreat = Fredericka_the_Great({
   subsets: ['latin'],
-  variable: '--font-limelight',
+  variable: '--font-fredericka-the-great',
   weight: ['400'],
 });
 

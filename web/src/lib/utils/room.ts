@@ -1,4 +1,4 @@
-import { post_create_room } from '../api';
+import { post_create_room } from '@/lib/api';
 
 export const formatRoomKey = (val: string) => {
   const cleaned = val.replace(/[^a-z0-9]/gi, '');

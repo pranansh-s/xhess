@@ -7,8 +7,8 @@ export { getKingPosition, isKingInCheck, isPositionUnderAttack, willMoveCheck } 
 export const getValidMovesForPiece = (board: Board, piece: Piece, player: Color, moves: Move[] = []): Position[] => {
   const strategy = movementStrategies[piece.type];
   if (!strategy) return [];
-  
+
   const validMoves = strategy.getValidMoves(board, piece, player, moves);
-  
+
   return validMoves.filter(to => !willMoveCheck(board, { from: piece.pos, to }, player));
 };

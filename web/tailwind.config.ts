@@ -19,7 +19,7 @@ const config: Config = {
         sm: '30px',
       },
       fontFamily: {
-        sans: 'var(--font-limelight)',
+        sans: 'var(--font-fredericka-the-great)',
         serif: 'var(--font-merriweather-sans)',
       },
     },

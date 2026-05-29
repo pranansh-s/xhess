@@ -9,8 +9,7 @@ import { Provider } from 'react-redux';
 import { setAccessToken } from '@/lib/utils/auth';
 
 import { auth } from '@/lib/firebase';
-
-import { store } from './store';
+import { store } from '@/redux/store';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState<boolean>(false);

@@ -4,16 +4,16 @@ import tw from 'tailwind-styled-components';
 
 import { Room } from '@xhess/shared/types';
 
+import GameBar from '@/components/game-bar';
+import DrawOffer from '@/components/modals/DrawOffer';
+import GameOver from '@/components/modals/GameOver';
+import GameSettings from '@/components/modals/GameSettings';
+import Surrender from '@/components/modals/Surrender';
+import Waiting from '@/components/modals/Waiting';
+import GameUI from '@/components/room/GameUI';
+
 import useRoomInit from '@/hooks/useRoomInit';
 import { useAppSelector } from '@/redux/hooks';
-
-import GameBar from '../game-bar';
-import DrawOffer from '../modals/DrawOffer';
-import GameOver from '../modals/GameOver';
-import GameSettings from '../modals/GameSettings';
-import Surrender from '../modals/Surrender';
-import Waiting from '../modals/Waiting';
-import GameUI from './GameUI';
 
 interface IRoomProps {
   roomId: string;

@@ -11,6 +11,7 @@
 [![Express](https://img.shields.io/badge/Express-5.1-lightgrey?style=for-the-badge&logo=express)](https://expressjs.com/)
 [![Socket.io](https://img.shields.io/badge/Socket.io-4.8-black?style=for-the-badge&logo=socketdotio)](https://socket.io/)
 [![Redis](https://img.shields.io/badge/Redis-5.5-red?style=for-the-badge&logo=redis)](https://redis.io/)
+[![Upstash](https://img.shields.io/badge/Upstash-Serverless_Redis-teal?style=for-the-badge&logo=upstash)](https://upstash.com/)
 [![Firebase](https://img.shields.io/badge/Firebase-11.7-orange?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-blue?style=for-the-badge&logo=docker)](https://www.docker.com/)
 
@@ -38,10 +39,12 @@ Rather than a simple Minimum Viable Product, Xhess is designed as a **Proof of C
 
 - **🎮 Immersive 3D UI Visuals:** Sleek, custom 3D chess piece models rendered smoothly in the browser using **React Three Fiber (R3F)**, **Drei**, and **Three.js**. Rather than placing heavy 3D canvases on the active playfield, these assets are strategically deployed for a premium user experience—including an interactive 3D Side Selector in the game settings and a beautiful, animated floating 3D piece scene in the lobby background. The gameplay board is kept in a highly responsive and crisp 2D grid.
 - **🔌 Real-Time Gameplay:** Bidirectional, ultra-low-latency move and game state updates powered by **Socket.IO** rooms.
-- **⚡ Cache-Aside Storage Pipeline:** A highly performant database access pattern using a **Redis** cache in front of a reliable **Google Firestore (Firebase)** document store.
+- **⚡ Cache-Aside Storage Pipeline:** A highly performant database access pattern using **Redis** (local) or **Upstash** (production) cache in front of a reliable **Google Firestore (Firebase)** document store.
 - **🔗 Unified Monorepo:** Shared TypeScript types, Zod schemas, and utility functions package (`@xhess/shared`) for complete, compile-time end-to-end type safety between frontend and backend.
+- **🛡️ Strict Input Validation:** All Socket.IO payloads are validated at the transport boundary using **Zod** schemas, preventing malformed or malicious data from reaching the game engine.
 - **🔒 Secure & Resilient Architecture:** Enterprise-grade security containing **Firebase Auth** validations, **Helmet** HTTP headers, **strict CORS** settings, and Express **rate limiting** to mitigate DDoS and common web threats.
 - **🏦 Consistent State Management:** Predictable state containers built with **Redux Toolkit** and Redux-Thunk to ensure smooth in-game user interfaces.
+- **🏗️ Horizontally Scalable Backend:** All server-side state is stored in Redis/Firestore with no in-memory maps, allowing multiple Node.js instances behind a load balancer.
 - **🐳 Fully Containerized:** Built with Docker and multi-stage builds (`Dockerfile.server`, `Dockerfile.web`, `docker-compose.yml`) for seamless local runs and effortless deployments.
 
 ---
@@ -54,7 +57,7 @@ Xhess leverages modern system design patterns, separating core game logic, cachi
 graph TD
     A[Next.js Web App with 3D UI] <-->|Socket.IO Bidirectional| B(Express Backend API)
     A -->|HTTPS REST API| B
-    B -->|1. Cache Query| C{Redis Cache}
+    B -->|1. Cache Query| C{Redis / Upstash}
     C -->|Cache Hit| B
     C -->|Cache Miss| D[Firebase Firestore]
     D -->|2. Return Document| B
@@ -65,16 +68,26 @@ graph TD
 
 To minimize latency and Firebase Firestore read/write billing under continuous multiplayer actions, the server utilizes a strategic cache-aside manager (`db.controller.ts`):
 
-1.  **Read Action:** The service queries Redis. If the data is cached (Cache Hit), it's returned immediately. If not found (Cache Miss), the database fetches it from Google Firestore, updates the Redis cache (with a 60-minute TTL), and returns the payload.
+1.  **Read Action:** The service queries Redis (or Upstash in production). If the data is cached (Cache Hit), it's returned immediately. If not found (Cache Miss), the database fetches it from Google Firestore, updates the Redis cache (with a 60-minute TTL), and returns the payload.
 2.  **Write/Delete Action:** Mutations are committed directly to Firestore first, and then corresponding Redis cache keys are instantly updated or evicted to avoid stale reads.
+
+### 🔀 Environment-Aware Redis
+
+The `RedisService` automatically selects the appropriate Redis client based on `NODE_ENV`:
+
+| Environment | Redis Client                 | Connection Type          |
+| ----------- | ---------------------------- | ------------------------ |
+| Development | Native `redis` (TCP)         | `redis://localhost:6379` |
+| Production  | `@upstash/redis` (HTTP REST) | Upstash REST API         |
 
 ---
 
 ## 🧩 Custom Rules Engine
 
-Xhess implements its own custom chess engine from the ground up under `@xhess/shared/utils/chess.ts`, ensuring complete control over gameplay validation without external npm packages:
+Xhess implements its own custom chess engine from the ground up using a **Strategy Pattern** architecture under `@xhess/shared/utils/rules/`, ensuring complete control over gameplay validation without external npm packages:
 
-- **Move Calculators:** Generates legal move sets for Pawns (including initial double steps), Rooks, Knights, Bishops, Queens, and Kings.
+- **Strategy Pattern Architecture:** Each piece type (Pawn, Rook, Knight, Bishop, Queen, King) has its own isolated movement strategy module, making the engine highly modular and extensible.
+- **Move Calculators:** Generates legal move sets for all piece types, including initial pawn double steps, en passant, and castling (kingside and queenside).
 - **Pin & Check Detection:** Calculates coordinate matrices to predict if a hypothetical move would place or leave the current player's King in check (`willMoveCheck`), filtering out illegal moves before rendering them.
 - **Endgame Valuator:** Automatically evaluates and handles **Stalemate** and **Checkmate** scenarios to gracefully finish rooms and reward winners.
 
@@ -90,15 +103,25 @@ xhess/
 ├── shared/                  # Common library package (@xhess/shared)
 │   ├── src/
 │   │   ├── constants/       # Chessboard direction vectors (cardinal, diagonal, knight)
-│   │   ├── schemas/         # Shared Zod validation schemas (Auth, Room, Profiles)
+│   │   ├── schemas/         # Shared Zod validation schemas (Auth, Room, Profiles, Game)
 │   │   ├── types/           # Shared Type definitions (Piece, Game, Move, Position)
 │   │   └── utils/           # Shared Chess logic, board state mutators, and engines
+│   │       └── rules/       # Strategy Pattern piece movement modules
+│   │           ├── common.ts    # Shared movement interface and directional helper
+│   │           ├── check.ts     # King check, pin detection, and attack validation
+│   │           ├── pawn.ts      # Pawn movement (captures, en passant, double step)
+│   │           ├── rook.ts      # Rook cardinal movement
+│   │           ├── knight.ts    # Knight L-shaped jumps
+│   │           ├── bishop.ts    # Bishop diagonal movement
+│   │           ├── queen.ts     # Queen combined movement
+│   │           ├── king.ts      # King movement and castling logic
+│   │           └── index.ts     # Strategy registry mapping PieceType → Strategy
 │   └── package.json
 ├── server/                  # Backend Express Node application (@xhess/server)
 │   ├── src/
 │   │   ├── config/          # Environment configuration loaders (Firebase, Sockets)
 │   │   ├── controllers/     # Socket controllers and Cache-Aside database layers
-│   │   ├── databases/       # Redis client & Firebase Admin SDK initializers
+│   │   ├── databases/       # Redis/Upstash client & Firebase Admin SDK initializers
 │   │   ├── middleware/      # Rate-limit, Helmet, CORS, and Auth middleware
 │   │   └── routes/          # Express Profile and Room Router maps
 │   └── package.json
@@ -131,6 +154,10 @@ FIREBASE_CLIENT_EMAIL=your-service-account-email
 FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 CORS_ORIGIN=http://localhost:3000
 REDIS_URL=redis://localhost:6379
+
+# Production only (Upstash Redis)
+UPSTASH_REDIS_REST_URL=https://your-instance.upstash.io
+UPSTASH_REDIS_REST_TOKEN=your-upstash-token
 ```
 
 #### Frontend Environment (`web/.env`)
@@ -206,6 +233,6 @@ docker-compose up --build
 
 The project is pre-configured for continuous integration and zero-downtime deployment:
 
-- **Server Deployments:** Managed using `Dockerfile.server` targeting Express.
+- **Server Deployments:** Managed using `Dockerfile.server` targeting Express. In production, the server connects to **Upstash Redis** via HTTP REST instead of a local Redis TCP connection.
 - **Web Deployments:** Containerized via `Dockerfile.web` utilizing optimized Next.js multi-stage build layers.
-- **Render Support:** Configured via `render.yaml` for rapid, single-click monorepo deployments.
+- **Render Support:** Configured via `render.yaml` for rapid, single-click monorepo deployments with Upstash Redis integration.

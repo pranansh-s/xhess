@@ -81,9 +81,7 @@ const Heading = tw.h1`
   px-3
   py-2
   text-center
-  font-sans
   text-9xl
-  font-black
   text-white
   duration-200
   ease-in-out

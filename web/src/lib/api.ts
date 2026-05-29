@@ -3,11 +3,12 @@ import axios, { AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 
 import { Profile } from '@xhess/shared/schemas';
 
-import { axiosConfig } from '@/constants/config';
+import { getAccessToken } from '@/lib/utils/auth';
+import { handleAPIErrors } from '@/lib/utils/error';
 
-import { auth } from './firebase';
-import { getAccessToken } from './utils/auth';
-import { handleAPIErrors } from './utils/error';
+import { auth } from '@/lib/firebase';
+
+import { axiosConfig } from '@/constants/config';
 
 const client = axios.create(axiosConfig);
 

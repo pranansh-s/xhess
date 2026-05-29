@@ -3,11 +3,11 @@ import { memo } from 'react';
 import SocketService from '@/services/socket.service';
 import tw from 'tailwind-styled-components';
 
+import Button from '@/components/common/Button';
+import ModalContainer from '@/components/modals/Modal';
+
 import { closeModal } from '@/redux/features/modalSlice';
 import { useAppDispatch } from '@/redux/hooks';
-
-import Button from '../common/Button';
-import ModalContainer from './Modal';
 
 const Surrender = memo(() => {
   const dispatch = useAppDispatch();
@@ -22,7 +22,7 @@ const Surrender = memo(() => {
   };
 
   return (
-    <StyledModalContainer>
+    <ModalContainer className="max-w-[275px]">
       <AreWeSure>are you sure, surrender?</AreWeSure>
       <ButtonsContainer>
         <Button themeColor="green" onClick={handleYes}>
@@ -32,27 +32,16 @@ const Surrender = memo(() => {
           No
         </Button>
       </ButtonsContainer>
-    </StyledModalContainer>
+    </ModalContainer>
   );
 });
 
 Surrender.displayName = 'Surrender';
 export default Surrender;
 
-const StyledModalContainer = tw(ModalContainer)`
-  flex
-  max-w-[368px]
-  items-center
-  gap-10
-  border-none
-  bg-zinc-900
-  py-12
-`;
-
 const AreWeSure = tw.span`
   text-2xl
   text-secondary
-  opacity-75
 `;
 
 const ButtonsContainer = tw.div`

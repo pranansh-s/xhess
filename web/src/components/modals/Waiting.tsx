@@ -2,32 +2,22 @@
 
 import tw from 'tailwind-styled-components';
 
-import ModalContainer from './Modal';
+import ModalContainer from '@/components/modals/Modal';
 
 const Waiting = () => {
   return (
-    <StyledModalContainer>
+    <ModalContainer>
       <WaitingText>waiting for room owner to start game</WaitingText>
       <LoaderContainer>
         <LoadDot className="bg-red-700 [animation-delay:-0.3s]" />
         <LoadDot className="bg-blue-700 [animation-delay:-0.15s]" />
         <LoadDot className="bg-green-700" />
       </LoaderContainer>
-    </StyledModalContainer>
+    </ModalContainer>
   );
 };
 
 export default Waiting;
-
-const StyledModalContainer = tw(ModalContainer)`
-  max-w-[368px]
-  flex-row
-  items-center
-  gap-4
-  border-none
-  bg-zinc-900
-  py-12
-`;
 
 const WaitingText = tw.span`
   text-xl

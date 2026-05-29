@@ -148,6 +148,11 @@ const SocketService = {
   },
 
   leaveRoom: () => {
+    socket.off(SocketEvent.ERROR);
+    socket.off(SocketEvent.RECEIVE_CHAT_MESSAGE);
+    socket.off(SocketEvent.GAME_JOINED);
+    socket.off(SocketEvent.MOVE_UPDATE);
+    socket.off(SocketEvent.DRAW_OFFER_REJECTED);
     socket.disconnect();
   },
 };

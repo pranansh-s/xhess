@@ -1,9 +1,9 @@
 'use client';
 
-import { forwardRef, useMemo } from 'react';
+import { forwardRef, useEffect, useMemo } from 'react';
 
 import { useFBX } from '@react-three/drei';
-import { Group, Material, Mesh } from 'three';
+import { Group, Mesh } from 'three';
 
 import { createColoredModel } from '@/lib/utils/model';
 
@@ -19,16 +19,23 @@ const ChessModel = forwardRef<Group, IChessModelProps>(
   ({ modelPath, color, position = [0, 0, 0], rotation = [0, 0, 0], scale = 0.005 }, ref) => {
     const model = useFBX(modelPath);
     const instance = useMemo(() => {
-      const coloredModel = createColoredModel(model.clone(), color);
-
-      model.traverse(child => {
-        if (child instanceof Mesh && child.material instanceof Material) {
-          child.material.dispose();
-        }
-      });
-
-      return coloredModel;
+      return createColoredModel(model.clone(), color);
     }, [model, color]);
+
+    useEffect(() => {
+      return () => {
+        instance.traverse(child => {
+          if (child instanceof Mesh) {
+            child.geometry.dispose();
+            if (Array.isArray(child.material)) {
+              child.material.forEach(m => m.dispose());
+            } else if (child.material) {
+              child.material.dispose();
+            }
+          }
+        });
+      };
+    }, [instance]);
 
     return (
       <group ref={ref} position={position} rotation={rotation}>

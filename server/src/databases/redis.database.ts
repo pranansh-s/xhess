@@ -1,5 +1,5 @@
-import { createClient as createNativeClient, RedisClientType } from 'redis';
 import { Redis as UpstashRedis } from '@upstash/redis';
+import { createClient as createNativeClient, RedisClientType } from 'redis';
 
 class RedisService {
   private nativeClient: RedisClientType | null = null;

@@ -4,10 +4,11 @@ import tw from 'tailwind-styled-components';
 
 import { Profile } from '@xhess/shared/schemas';
 
+import Timer from '@/components/room/user-bar/Timer';
+
 import { useAppSelector } from '@/redux/hooks';
 
 import avatar from '@/../public/abstract-user-flat-3.png';
-import Timer from './Timer';
 
 interface IUserBarProps {
   timer?: number;

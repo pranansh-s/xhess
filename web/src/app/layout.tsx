@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 
 import { ToastContainer } from 'react-toastify';
 
-import { limelight, merriweatherSans } from '@/lib/fonts';
+import { frederickatheGreat, merriweatherSans } from '@/lib/fonts';
 import { Providers } from '@/redux/provider';
 
 import './globals.css';
@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en" className="bg-black">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
       <body
-        className={`${limelight.variable} ${merriweatherSans.variable} relative h-screen w-screen overflow-clip antialiased`}
+        className={`${frederickatheGreat.variable} ${merriweatherSans.variable} relative h-screen w-screen overflow-clip antialiased`}
       >
         <Providers>
           <ToastContainer />

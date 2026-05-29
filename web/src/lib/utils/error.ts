@@ -3,11 +3,11 @@ import { AxiosError, isAxiosError } from 'axios';
 import { FirebaseError } from 'firebase/app';
 import { z } from 'zod';
 
+import { mapAPIStatusCodeToMessage, mapAxiosCodeToMessage, mapFirebaseErrorToMessage } from '@/lib/utils/maps';
+
 import { showErrorToast } from '@/components/common/ErrorToast';
 
 import { strings } from '@/constants/strings';
-
-import { mapAPIStatusCodeToMessage, mapAxiosCodeToMessage, mapFirebaseErrorToMessage } from './maps';
 
 const handleZodErrors = (
   err: z.ZodError,

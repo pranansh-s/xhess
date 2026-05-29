@@ -2,8 +2,8 @@ import { memo } from 'react';
 
 import tw from 'tailwind-styled-components';
 
-import ChatInput from './ChatInput';
-import MessageList from './MessageList';
+import ChatInput from '@/components/game-bar/chat/ChatInput';
+import MessageList from '@/components/game-bar/chat/MessageList';
 
 const Chat = memo(() => {
   return (

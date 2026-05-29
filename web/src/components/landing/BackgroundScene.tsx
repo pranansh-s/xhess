@@ -1,17 +1,17 @@
 'use client';
 
-import { memo, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 
 import { modelPaths } from '@/constants';
 import { IFloatingModelProps, IFloatingModelState } from '@/types';
 import { useFBX } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import tw from 'tailwind-styled-components';
-import { Group } from 'three';
+import { Group, Mesh } from 'three';
 
 import { createColoredModel } from '@/lib/utils/model';
 
-import Lighting from '../common/Lighting';
+import Lighting from '@/components/common/Lighting';
 
 const usePreloadedModels = () => {
   const rook = useFBX(modelPaths[0]);
@@ -32,6 +32,22 @@ const FloatingModel = ({
 }: IFloatingModelProps) => {
   const ref = useRef<Group>(null);
   const instance = useMemo(() => createColoredModel(model, color ? '#e7e2d9' : '#121212'), [model, color]);
+
+  useEffect(() => {
+    return () => {
+      instance.traverse(child => {
+        if (child instanceof Mesh) {
+          child.geometry.dispose();
+          if (Array.isArray(child.material)) {
+            child.material.forEach(m => m.dispose());
+          } else if (child.material) {
+            child.material.dispose();
+          }
+        }
+      });
+    };
+  }, [instance]);
+
   const { viewport } = useThree();
 
   const currentSpeed = useRef([...movementSpeed]);
