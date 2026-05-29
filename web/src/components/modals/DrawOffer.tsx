@@ -25,7 +25,7 @@ const DrawOffer = memo(() => {
   };
 
   return (
-    <ModalContainer className="max-w-[368px]">
+    <ModalContainer className="max-w-[380px]">
       <TitleText>DRAW OFFER</TitleText>
       <OfferMessage>Your opponent has offered a draw. Do you accept?</OfferMessage>
       <ButtonsContainer>

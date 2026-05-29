@@ -6,7 +6,7 @@ import ModalContainer from '@/components/modals/Modal';
 
 const Waiting = () => {
   return (
-    <ModalContainer>
+    <ModalContainer className='max-w-[400px]'>
       <WaitingText>waiting for room owner to start game</WaitingText>
       <LoaderContainer>
         <LoadDot className="bg-red-700 [animation-delay:-0.3s]" />
@@ -28,12 +28,13 @@ const WaitingText = tw.span`
 const LoaderContainer = tw.div`
   mt-1
   flex
+  items-center
   gap-1
 `;
 
 const LoadDot = tw.div`
-  h-1
-  w-1
+  h-2
+  w-2
   animate-bounce
   rounded-full
 `;
