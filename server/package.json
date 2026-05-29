@@ -12,6 +12,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@upstash/redis": "^1.38.0",
     "cors": "^2.8.5",
     "dotenv": "^17.0.0",
     "express": "^5.1.0",
@@ -23,9 +24,9 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@xhess/shared": "1.0.0",
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.7",
+    "@xhess/shared": "1.0.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
