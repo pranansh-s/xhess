@@ -29,6 +29,14 @@ app.use(handleRouteErrors);
 
 const PORT = process.env.PORT ?? 8080;
 
+const router = express.Router();
+
+router.get('/health', (_, res) => {
+  res.status(200).send('OK');
+});
+
+app.use(router);
+
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
