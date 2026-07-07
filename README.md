@@ -5,8 +5,6 @@
 
 # XHESS
 
-### A Modern, Real-Time Multiplayer Chess Platform with an Immersive 3D UI & High-Performance Caching
-
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.3.2-black?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
 [![React Three Fiber](https://img.shields.io/badge/React_Three_Fiber-9.1.2-blueviolet?style=for-the-badge&logo=three.js&logoColor=white)](https://github.com/pmndrs/react-three-fiber)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.8-blue?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
