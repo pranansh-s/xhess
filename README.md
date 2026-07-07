@@ -2,7 +2,7 @@
   <img src="./assets/banner.png" alt="Xhess Banner" width="100%" style="border-radius: 12px; margin-bottom: 12px;" />
   
   <img src="./assets/xhess-demo.gif" alt="Xhess Gameplay Demo" width="90%" style="border-radius: 10px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); margin-bottom: 24px;" />
-
+  
 # XHESS
 
 [![Next.js 15](https://img.shields.io/badge/Next.js-15.3.2-black?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
@@ -14,7 +14,8 @@
 [![Firebase 11](https://img.shields.io/badge/Firebase-11.7-orange?style=for-the-badge&logo=firebase&logoColor=white)](https://firebase.google.com/)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-blue?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
----
+</div>
+<br/>
 
 ## Overview
 
