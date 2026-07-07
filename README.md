@@ -14,34 +14,25 @@
 [![Firebase 11](https://img.shields.io/badge/Firebase-11.7-orange?style=for-the-badge&logo=firebase&logoColor=white)](https://firebase.google.com/)
 [![Docker](https://img.shields.io/badge/Docker-Containerized-blue?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-  <p align="center">
-    <a href="#-key-features">Key Features</a> •
-    <a href="#-system-architecture">Architecture</a> •
-    <a href="#-custom-chess-engine">Rules Engine</a> •
-    <a href="#-monorepo-layout">Monorepo Layout</a> •
-    <a href="#-getting-started">Getting Started</a>
-  </p>
-</div>
-
 ---
 
-## 🌟 Overview
+## Overview
 
 **Xhess** is a professional, high-performance real-time multiplayer chess platform. Built as a modern, monorepo Proof of Concept (POC), it demonstrates robust system-design strategies, real-time WebSocket synchronization, and a custom cache-aside pipeline designed to handle high-traffic gaming workloads smoothly and cost-effectively.
 
 ---
 
-## 🚀 Key Features
+## Key Features
 
-*   **🎮 Stunning 3D WebGL Interface:** Custom 3D chess pieces rendered smoothly in the browser using **React Three Fiber (R3F)** and **Three.js**, featuring interactive controls, studio lighting, a 3D Side Selector, and elegant hand-drawn themes.
-*   **🔌 Real-Time Multiplayer Gateway:** Low-latency bidirectional gameplay, turn clocks, draw negotiations, surrenders, and instant live messaging powered by **Socket.IO** rooms.
-*   **⚡ Smart Caching Pipeline (Cache-Aside):** Dual-layer database that buffers active games and profiles in **Redis** (local TCP / Upstash serverless HTTP) before committing to a durable **Google Firestore** store, cutting database costs and latency.
-*   **🛡️ Robust Gateway Security:** Active sessions are secured using **Firebase Auth** ID Token checks server-side, with full transport-level input validation powered by **Zod** schemas.
-*   **🔗 Shared Type-Safe Monorepo:** Structured using npm Workspaces to share types, Zod schemas, and game utils seamlessly between Next.js frontend and Express backend.
+*   **Stunning 3D WebGL Interface:** Custom 3D chess pieces rendered smoothly in the browser using **React Three Fiber (R3F)** and **Three.js**, featuring interactive controls, studio lighting, a 3D Side Selector, and elegant hand-drawn themes.
+*   **Real-Time Multiplayer Gateway:** Low-latency bidirectional gameplay, turn clocks, draw negotiations, surrenders, and instant live messaging powered by **Socket.IO** rooms.
+*   **Smart Caching Pipeline (Cache-Aside):** Dual-layer database that buffers active games and profiles in **Redis** (local TCP / Upstash serverless HTTP) before committing to a durable **Google Firestore** store, cutting database costs and latency.
+*   **Robust Gateway Security:** Active sessions are secured using **Firebase Auth** ID Token checks server-side, with full transport-level input validation powered by **Zod** schemas.
+*   **Shared Type-Safe Monorepo:** Structured using npm Workspaces to share types, Zod schemas, and game utils seamlessly between Next.js frontend and Express backend.
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 Xhess decouples client interactions, real-time socket events, cache lookups, and global database updates:
 
@@ -56,13 +47,13 @@ graph TD
     B -->|3. Populate Cache| C
 ```
 
-### 🏎️ Simple Cache-Aside Pattern
+### Simple Cache-Aside Pattern
 1.  **Read:** Check **Redis** first. On hit, return in under a millisecond. On miss, load from **Firestore**, cache in Redis (60m TTL), and respond.
 2.  **Write:** Write directly to **Firestore**, then instantly overwrite or invalidate the **Redis** cache to prevent stale reads.
 
 ---
 
-## 🧩 Custom Chess Engine
+## Custom Chess Engine
 
 Xhess features a custom-built, purely mathematical chess validator under `@xhess/shared/utils/rules/` that runs without relying on heavy third-party chess libraries:
 
@@ -72,7 +63,7 @@ Xhess features a custom-built, purely mathematical chess validator under `@xhess
 
 ---
 
-## 📂 Monorepo Layout
+## Monorepo Layout
 
 Xhess is organized as an **npm Workspaces monorepo**, strictly dividing architectural layers while preserving full compilation-time type safety:
 
@@ -102,7 +93,7 @@ A responsive, high-fidelity Next.js 15 client built for immersive gameplay:
 
 ---
 
-## ⚙️ Getting Started
+## Getting Started
 
 ### 1. Configure Environments
 Create a `.env` file in both `server/` and `web/` directories:
