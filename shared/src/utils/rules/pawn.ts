@@ -10,12 +10,12 @@ export const PawnStrategy: PieceMovementStrategy = {
     if (newY >= 0 && newY < 8) {
       if (!board[newY][x]) {
         validMoves.push({ x, y: newY });
-      }
-      if (y === 6 && player === 'white' && !board[newY - 1][x]) {
-        validMoves.push({ x, y: newY - 1 });
-      }
-      if (y === 1 && player === 'black' && !board[newY + 1][x]) {
-        validMoves.push({ x, y: newY + 1 });
+        if (y === 6 && player === 'white' && !board[newY - 1][x]) {
+          validMoves.push({ x, y: newY - 1 });
+        }
+        if (y === 1 && player === 'black' && !board[newY + 1][x]) {
+          validMoves.push({ x, y: newY + 1 });
+        }
       }
 
       [-1, 1].forEach(dir => {
