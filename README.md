@@ -19,7 +19,7 @@
 
 ## Overview
 
-**Xhess** is a professional, high-performance real-time multiplayer chess platform. Built as a modern, monorepo Proof of Concept (POC), it demonstrates robust system-design strategies, real-time WebSocket synchronization, and a custom cache-aside pipeline designed to handle high-traffic gaming workloads smoothly and cost-effectively.
+**Xhess** is a professional, high-performance real-time multiplayer chess platform. Built as a modern, monorepo Proof of Concept (POC), it demonstrates robust system-design strategies, real-time WebSocket synchronization, and a custom cache-aside / write-through pipeline designed to handle high-traffic gaming workloads smoothly and cost-effectively.
 
 ---
 
@@ -27,7 +27,7 @@
 
 *   **Stunning 3D WebGL Interface:** Custom 3D chess pieces rendered smoothly in the browser using **React Three Fiber (R3F)** and **Three.js**, featuring interactive controls, studio lighting, a 3D Side Selector, and elegant hand-drawn themes.
 *   **Real-Time Multiplayer Gateway:** Low-latency bidirectional gameplay, turn clocks, draw negotiations, surrenders, and instant live messaging powered by **Socket.IO** rooms.
-*   **Smart Caching Pipeline (Cache-Aside):** Dual-layer database that buffers active games and profiles in **Redis** (local TCP / Upstash serverless HTTP) before committing to a durable **Google Firestore** store, cutting database costs and latency.
+*   **Smart Caching Pipeline (Cache-Aside / Write-Through):** Dual-layer database that buffers active games and profiles in **Redis** (local TCP / Upstash serverless HTTP) before committing to a durable **Google Firestore** store, cutting database costs and latency.
 *   **Robust Gateway Security:** Active sessions are secured using **Firebase Auth** ID Token checks server-side, with full transport-level input validation powered by **Zod** schemas.
 *   **Shared Type-Safe Monorepo:** Structured using npm Workspaces to share types, Zod schemas, and game utils seamlessly between Next.js frontend and Express backend.
 
@@ -48,9 +48,9 @@ graph TD
     B -->|3. Populate Cache| C
 ```
 
-### Simple Cache-Aside Pattern
+### Cache-Aside/Write-Through Pattern
 1.  **Read:** Check **Redis** first. On hit, return in under a millisecond. On miss, load from **Firestore**, cache in Redis (60m TTL), and respond.
-2.  **Write:** Write directly to **Firestore**, then instantly overwrite or invalidate the **Redis** cache to prevent stale reads.
+2.  **Write:** Write directly to **Firestore**, then instantly overwrites the **Redis** cache to prevent stale reads.
 
 ---
 
