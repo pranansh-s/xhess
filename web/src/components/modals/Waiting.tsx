@@ -8,11 +8,6 @@ const Waiting = () => {
   return (
     <ModalContainer className='max-w-[400px]'>
       <WaitingText>waiting for room owner to start game</WaitingText>
-      <LoaderContainer>
-        <LoadDot className="bg-red-700 [animation-delay:-0.3s]" />
-        <LoadDot className="bg-blue-700 [animation-delay:-0.15s]" />
-        <LoadDot className="bg-green-700" />
-      </LoaderContainer>
     </ModalContainer>
   );
 };
@@ -23,18 +18,4 @@ const WaitingText = tw.span`
   text-xl
   text-secondary
   opacity-75
-`;
-
-const LoaderContainer = tw.div`
-  mt-1
-  flex
-  items-center
-  gap-1
-`;
-
-const LoadDot = tw.div`
-  h-2
-  w-2
-  animate-bounce
-  rounded-full
 `;
