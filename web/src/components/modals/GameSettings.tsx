@@ -47,7 +47,7 @@ const AnimatedChessModel: React.FC<IAnimatedChessModelProps> = ({ animate, targe
     }
   });
 
-  return <ChessModel ref={groupRef} modelPath="../models/king.fbx" {...props} />;
+  return <ChessModel ref={groupRef} modelPath="/models/king.fbx" {...props} />;
 };
 
 const GameSettings = memo(() => {
