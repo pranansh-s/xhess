@@ -110,7 +110,7 @@ REDIS_URL=redis://localhost:6379
 
 **Frontend (`web/.env`)**
 ```env
-NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+BACKEND_URL=http://localhost:8000
 ```
 
 ### 2. Run Redis
