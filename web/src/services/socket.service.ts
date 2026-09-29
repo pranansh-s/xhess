@@ -20,7 +20,7 @@ import {
 import { closeModal, openModal } from '@/redux/features/modalSlice';
 import { AppDispatch, store } from '@/redux/store';
 
-const socket = io(process.env.BACKEND_URL);
+const socket = io(process.env.NEXT_PUBLIC_BACKEND_URL);
 
 const SocketService = {
   initSocket: (roomId: string, userId: string, dispatch: AppDispatch) => {
